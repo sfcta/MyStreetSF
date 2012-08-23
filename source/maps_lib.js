@@ -18,23 +18,28 @@ var MapsLib = {
   
   //the encrypted Table ID of your Fusion Table (found under File => About)
   //NOTE: numeric IDs will be depricated soon
-  fusionTableId:      "1m4Ez9xyTGfY2CU6O-UgEcPzlS0rnzLU93e4Faa0",  
+  fusionTableId:      "1OADgu5HNIR1CPerzUf2zKZGHR-o-FKfICl06YYA",  
   
   //*New Fusion Tables Requirement* API key. found at https://code.google.com/apis/console/      
-  googleApiKey:       "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",        
+  googleApiKey:       "AIzaSyDSscDrdYK3lENjefyjoBof_JjXY5LJLRo",        
   
   locationColumn:     "geometry",     //name of the location column in your Fusion Table
-  map_centroid:       new google.maps.LatLng(41.8781136, -87.66677856445312), //center that your map defaults to
-  locationScope:      "chicago",      //geographical area appended to all address searches
+  map_centroid:       new google.maps.LatLng(37.7750, -122.4183), //center that your map defaults to
+  locationScope:      "San+Francisco",//geographical area appended to all address searches
   recordName:         "result",       //for showing number of results
   recordNamePlural:   "results", 
   
   searchRadius:       805,            //in meters ~ 1/2 mile
-  defaultZoom:        11,             //zoom level when map is loaded (bigger is more zoomed in)
+  defaultZoom:        12,             //zoom level when map is loaded (bigger is more zoomed in)
   addrMarkerImage: 'http://derekeder.com/images/icons/blue-pushpin.png',
   currentPinpoint: null,
   
   initialize: function() {
+	  gapi.client.setApiKey(MapsLib.googleApiKey);
+    gapi.client.load('fusiontables', 'v1', MapsLib.querySliderDates);
+    console.log(gapi.client.fusiontables);
+
+  
     $( "#resultCount" ).html("");
   
     geocoder = new google.maps.Geocoder();
@@ -52,7 +57,9 @@ var MapsLib = {
     var loadRadius = MapsLib.convertToPlainString($.address.parameter('radius'));
     if (loadRadius != "") $("#ddlRadius").val(loadRadius);
     else $("#ddlRadius").val(MapsLib.searchRadius);
-    $(":checkbox").attr("checked", "checked");
+    $("#district").prop("selectedIndex", 0);
+    $("#project-type").prop("selectedIndex", 0);
+    $(":checkbox").prop("checked", true);
     $("#resultCount").hide();
      
     //run the default search
@@ -66,17 +73,39 @@ var MapsLib = {
 
     var whereClause = MapsLib.locationColumn + " not equal to ''";
     
-    //-----filter by type-------
-    //remove MapsLib if you don't have any types to filter
-    
+    //-----filter by district-------    
+    var district = $("#district").val();
+		if (district != "All") {
+		  whereClause += " AND District"+district+"=1";
+		}
+    //-------end of filter by district code--------
+		
+		//-----filter by funding source-------
     //best way to filter results by a type is to create a 'type' column and assign each row a number (strings work as well, but numbers are faster). then we can use the 'IN' operator and return all that are selected
-    var searchType = "type IN (-1,";
-    if ( $("#cbType1").is(':checked')) searchType += "1,";
-    if ( $("#cbType2").is(':checked')) searchType += "2,";
-    if ( $("#cbType3").is(':checked')) searchType += "3,";
-    whereClause += " AND " + searchType.slice(0, searchType.length - 1) + ")";
+    whereClause += " AND FundingCode IN (0,";
+    if ( $("#FSLocal").is(':checked')) 				whereClause += "4,5,6,7,";  // binary: 4-bit is on
+    if ( $("#FSRegional").is(':checked')) 		whereClause += "2,3,6,7,";  // binary: 2-bit is on
+    if ( $("#FSStateFederal").is(':checked')) whereClause += "1,3,5,7,";  // binary: 1-bit is on
+    // trim comma
+    whereClause = whereClause.substr(0,whereClause.length-1);
+    // close paren
+    whereClause += ")";
     
-    //-------end of filter by type code--------
+		//-----end of filter by funding source-------
+		
+		//-----filter by project type-------
+    var ptype = $("#project-type").val();
+		if (ptype != "All") {
+		  whereClause += " AND 'Project Type'='"+ptype + "'";
+		}
+    //-----end of filter by project type-------		
+
+		//-----filter by completion date-------
+		if (MapsLib.slideDate != null) {
+			whereClause += " AND 'Expected Completion Date' <= '" + 
+				MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
+		}
+    //-----end of filter by completion date-------		
     
     if (address != "") {
       if (address.toLowerCase().indexOf(MapsLib.locationScope) == -1)
@@ -115,6 +144,8 @@ var MapsLib = {
   },
   
   submitSearch: function(whereClause, map, location) {
+    console.log("whereClause = " + whereClause);
+
     //get using all filters
     MapsLib.searchrecords = new google.maps.FusionTablesLayer({
       query: {
@@ -226,5 +257,46 @@ var MapsLib = {
   convertToPlainString: function(text) {
     if (text == undefined) return '';
   	return decodeURIComponent(text);
-  }
+  },
+ 
+  querySliderDates: function() {
+ 		console.log('fusiontables client api loaded.');
+    var query = "select MINIMUM('Expected Completion Date'),MAXIMUM('Expected Completion Date') from "+MapsLib.fusionTableId;
+    // console.log(query);
+	  var request = gapi.client.fusiontables.query.sqlGet({'sql': query});
+		request.execute(MapsLib.setSliderMinMaxDates);
+  },
+  
+  // saves the min and max dates for the slider
+  setSliderMinMaxDates: function(json) {
+  	// console.log(json["rows"][0]);
+  	MapsLib.minDate = new Date(json["rows"][0][0]);
+  	MapsLib.maxDate = new Date(json["rows"][0][1]);
+  	MapsLib.diffDate = MapsLib.maxDate.getTime() - MapsLib.minDate.getTime();
+  	MapsLib.slideDate = MapsLib.maxDate;
+  	$("#slide-min-date").html((MapsLib.minDate.getMonth()+1) + "/" + MapsLib.minDate.getFullYear());
+  	$("#slide-max-date").html((MapsLib.maxDate.getMonth()+1) + "/" + MapsLib.maxDate.getFullYear());
+  	
+  	$("#slide-date").html((MapsLib.slideDate.getMonth()+1) + "/" + MapsLib.slideDate.getFullYear());
+  },
+  
+  // callback for slider movements, this just updates the text label
+  slide: function(event, ui) {
+	  // ui.value is in [0,100]
+	  // find the date matching in seconds
+		var newDate = new Date(MapsLib.minDate.getTime() + Math.round(ui.value/100.0*MapsLib.diffDate));
+		// last day of the month
+		// console.log("original: " + newDate);  	
+		newDate.setMonth(newDate.getMonth()+1);
+		newDate.setDate(0);
+		// console.log("using: " + newDate);
+		MapsLib.slideDate = newDate;
+  	$("#slide-date").html((MapsLib.slideDate.getMonth()+1) + "/" + MapsLib.slideDate.getFullYear());
+	},
+	
+	// callback for slider changes (after it's stopped moving)
+	slideChange: function(event, ui) {
+		// console.log(ui.value);
+		MapsLib.doSearch();
+	}
 }

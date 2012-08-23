@@ -29,3 +29,32 @@ a { color: #4B58A6; }
 .filter-blue { background-color: #5781FC; }
 .filter-purple { background-color: #7C54FB; }
 .filter-red { background-color: #FB6353; }
+
+/* lmz added */
+table.map_info, table.map_info tr { font-size:10pt; }
+
+table.map_info th {
+  width: 180px;
+  text-align:right;
+  background-color: rgb(99,115,102);
+  color: white;
+}
+
+table.map_info th,
+table.map_info td,
+table#filters th,
+table#filters td 
+{
+  padding: 4px 8px;
+}
+
+table#filters th
+{
+  width:130px;
+  text-align:right;
+  vertical-align:top;
+}
+
+select#ddlRadius { width:110px; }
+
+#slider { margin: 4px 4px; }
