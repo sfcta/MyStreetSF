@@ -35,10 +35,10 @@ var MapsLib = {
   currentPinpoint: null,
   
   initialize: function() {
-	  gapi.client.setApiKey(MapsLib.googleApiKey);
-    gapi.client.load('fusiontables', 'v1', MapsLib.querySliderDates);
-    console.log(gapi.client.fusiontables);
-
+    if (gapi.client.fusiontables == null) {
+  	  gapi.client.setApiKey(MapsLib.googleApiKey);
+      gapi.client.load('fusiontables', 'v1', MapsLib.querySliderDates);
+    }
   
     $( "#resultCount" ).html("");
   
@@ -53,13 +53,17 @@ var MapsLib = {
     MapsLib.searchrecords = null;
     
     //reset filters
-    $("#txtSearchAddress").val(MapsLib.convertToPlainString($.address.parameter('address')));
-    var loadRadius = MapsLib.convertToPlainString($.address.parameter('radius'));
+    if ($.address != null) {
+      $("#txtSearchAddress").val(MapsLib.convertToPlainString($.address.parameter('address')));
+      var loadRadius = MapsLib.convertToPlainString($.address.parameter('radius'));
+    }
     if (loadRadius != "") $("#ddlRadius").val(loadRadius);
     else $("#ddlRadius").val(MapsLib.searchRadius);
     $("#district").prop("selectedIndex", 0);
     $("#project-type").prop("selectedIndex", 0);
     $(":checkbox").prop("checked", true);
+		$("#slider").slider( "option", "value", 100 );
+		MapsLib.slide(null, null);
     $("#resultCount").hide();
      
     //run the default search
@@ -282,9 +286,14 @@ var MapsLib = {
   
   // callback for slider movements, this just updates the text label
   slide: function(event, ui) {
+    if (MapsLib.minDate == null) { return; }
+    
+    var ui_value = 100;
+    if (ui != null) { ui_value = ui.value; }
+        
 	  // ui.value is in [0,100]
 	  // find the date matching in seconds
-		var newDate = new Date(MapsLib.minDate.getTime() + Math.round(ui.value/100.0*MapsLib.diffDate));
+		var newDate = new Date(MapsLib.minDate.getTime() + Math.round(ui_value/100.0*MapsLib.diffDate));
 		// last day of the month
 		// console.log("original: " + newDate);  	
 		newDate.setMonth(newDate.getMonth()+1);

@@ -6,7 +6,21 @@
     <meta content='width=device-width, initial-scale=1.0' name='viewport' />
     <meta content='' name='description' />
     <meta content='' name='author' />
-    
+    <script type="text/javascript" src="source/jquery.js"></script>
+    <script type="text/javascript" src="source/bootstrap.js"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>    
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="source/maps_lib.js"></script>
+        
+    <script>
+    function OnLoadCallback() {
+      console.log("OnLoadCallback");
+      MapsLib.initialize();
+	    $("#slider").slider({value:100, slide:MapsLib.slide, change:MapsLib.slideChange });
+		}
+  	</script>
 		<!-- this is for making Fusion Tables API calls directly -->
 		<script src="https://apis.google.com/js/client.js?onload=OnLoadCallback"></script>
     
@@ -82,7 +96,7 @@
 					
 					<span>of</span>
 					<div class='input-addr' style="display:inline">
-					<input class='txt hint' type="text" title="Enter an address or an intersection" id="txtSearchAddress" />(<a href='#' id="findMe">find me</a>)
+					<input class='input-block-level' type="text" placeholder='Enter an address or an intersection' id="txtSearchAddress" />(<a href='#' id="findMe">find me</a>)
 					</div>
 					</td></tr>
 					
@@ -109,19 +123,11 @@
         </div>
       </div>
     </div>
-
-    <script type="text/javascript" src="source/jquery.js"></script>
-    <script type="text/javascript" src="source/bootstrap.js"></script>
     <script type="text/javascript" src="source/jquery.address.min.js"></script>
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>    
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery.min.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="source/maps_lib.js"></script>
-    <script type='text/javascript'>
+    <script type='text/javascript'>		        
       //<![CDATA[
   			$(document).ready(function() {
-	    		$("#slider").slider({value:100, slide:MapsLib.slide, change:MapsLib.slideChange });
+	    		// $("#slider").slider({value:100, slide:MapsLib.slide, change:MapsLib.slideChange });
   			});
         
         $(window).resize(function () {
@@ -132,7 +138,7 @@
         }).resize();
         
         $(function() {
-          MapsLib.initialize();
+          // MapsLib.initialize();
           
           $(':input').click(function(){
             MapsLib.doSearch();
@@ -167,5 +173,6 @@
         });
       //]]>
     </script>
+
   </body>
 </html>
