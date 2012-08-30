@@ -18,12 +18,12 @@ var MapsLib = {
   
   //the encrypted Table ID of your Fusion Table (found under File => About)
   //NOTE: numeric IDs will be depricated soon
-  fusionTableId:      "1OADgu5HNIR1CPerzUf2zKZGHR-o-FKfICl06YYA",  
+  fusionTableId:      "1-pdSEaE-xu36mhCGCt41U8m--5vwaM7ww-kz6Ko",  
   
   //*New Fusion Tables Requirement* API key. found at https://code.google.com/apis/console/      
   googleApiKey:       "AIzaSyDSscDrdYK3lENjefyjoBof_JjXY5LJLRo",        
   
-  locationColumn:     "geometry",     //name of the location column in your Fusion Table
+  locationColumn:     "Geometry",     //name of the location column in your Fusion Table
   map_centroid:       new google.maps.LatLng(37.7750, -122.4183), //center that your map defaults to
   locationScope:      "San+Francisco",//geographical area appended to all address searches
   recordName:         "result",       //for showing number of results
@@ -31,13 +31,13 @@ var MapsLib = {
   
   searchRadius:       805,            //in meters ~ 1/2 mile
   defaultZoom:        12,             //zoom level when map is loaded (bigger is more zoomed in)
-  addrMarkerImage: 'http://derekeder.com/images/icons/blue-pushpin.png',
   currentPinpoint: null,
   
   initialize: function() {
     if (gapi.client.fusiontables == null) {
   	  gapi.client.setApiKey(MapsLib.googleApiKey);
-      gapi.client.load('fusiontables', 'v1', MapsLib.querySliderDates);
+      gapi.client.load('fusiontables', 'v1', MapsLib.fusiontablesLoaded);
+
     }
   
     $( "#resultCount" ).html("");
@@ -48,7 +48,7 @@ var MapsLib = {
       center: MapsLib.map_centroid,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    map = new google.maps.Map($("#mapCanvas")[0],myOptions);
+    MapsLib.map = new google.maps.Map($("#mapCanvas")[0],myOptions);
     
     MapsLib.searchrecords = null;
     
@@ -86,10 +86,10 @@ var MapsLib = {
 		
 		//-----filter by funding source-------
     //best way to filter results by a type is to create a 'type' column and assign each row a number (strings work as well, but numbers are faster). then we can use the 'IN' operator and return all that are selected
-    whereClause += " AND FundingCode IN (0,";
-    if ( $("#FSLocal").is(':checked')) 				whereClause += "4,5,6,7,";  // binary: 4-bit is on
-    if ( $("#FSRegional").is(':checked')) 		whereClause += "2,3,6,7,";  // binary: 2-bit is on
-    if ( $("#FSStateFederal").is(':checked')) whereClause += "1,3,5,7,";  // binary: 1-bit is on
+    whereClause += " AND 'Funding Source Code' IN (0,";
+    if ( $("#FSPropK").is(':checked')) 		whereClause += "4,5,6,7,";  // binary: 4-bit is on
+    if ( $("#FSTFCA").is(':checked')) 		whereClause += "2,3,6,7,";  // binary: 2-bit is on
+    if ( $("#FSRegStFed").is(':checked')) whereClause += "1,3,5,7,";  // binary: 1-bit is on
     // trim comma
     whereClause = whereClause.substr(0,whereClause.length-1);
     // close paren
@@ -102,7 +102,15 @@ var MapsLib = {
 		if (ptype != "All") {
 		  whereClause += " AND 'Project Type'='"+ptype + "'";
 		}
-    //-----end of filter by project type-------		
+    //-----end of filter by project type-------
+    
+		//-----filter by project sponsor-------    
+    var psponsor = $("#project-sponsor").val();
+    if (psponsor != "All") {
+    	whereClause += " AND 'Sponsor'='" + psponsor + "'";
+    }
+    //-----end of filter by project sponsor-------    
+    
 
 		//-----filter by completion date-------
 		if (MapsLib.slideDate != null) {
@@ -121,13 +129,12 @@ var MapsLib = {
           
           $.address.parameter('address', encodeURIComponent(address));
           $.address.parameter('radius', encodeURIComponent(MapsLib.searchRadius));
-          map.setCenter(MapsLib.currentPinpoint);
-          map.setZoom(14);
+          MapsLib.map.setCenter(MapsLib.currentPinpoint);
+          MapsLib.map.setZoom(14);
           
           MapsLib.addrMarker = new google.maps.Marker({
             position: MapsLib.currentPinpoint, 
-            map: map, 
-            icon: MapsLib.addrMarkerImage,
+            map: MapsLib.map, 
             animation: google.maps.Animation.DROP,
             title:address
           });
@@ -135,7 +142,7 @@ var MapsLib = {
           whereClause += " AND ST_INTERSECTS(" + MapsLib.locationColumn + ", CIRCLE(LATLNG" + MapsLib.currentPinpoint.toString() + "," + MapsLib.searchRadius + "))";
           
           MapsLib.drawSearchRadiusCircle(MapsLib.currentPinpoint);
-          MapsLib.submitSearch(whereClause, map, MapsLib.currentPinpoint);
+          MapsLib.submitSearch(whereClause, MapsLib.map, MapsLib.currentPinpoint);
         } 
         else {
           alert("We could not find your address: " + status);
@@ -143,11 +150,13 @@ var MapsLib = {
       });
     }
     else { //search without geocoding callback
-      MapsLib.submitSearch(whereClause, map);
+      MapsLib.submitSearch(whereClause, MapsLib.map);
     }
   },
   
   submitSearch: function(whereClause, map, location) {
+		// keep the whereClause for the displayCount
+		MapsLib.whereClause = whereClause;
     console.log("whereClause = " + whereClause);
 
     //get using all filters
@@ -159,7 +168,7 @@ var MapsLib = {
       }
     });
     MapsLib.searchrecords.setMap(map);
-    MapsLib.displayCount(whereClause);
+    MapsLib.displayCount();
   },
   
   clearSearch: function() {
@@ -207,7 +216,7 @@ var MapsLib = {
         strokeWeight: 1,
         fillColor: "#4b58a6",
         fillOpacity: 0.05,
-        map: map,
+        map: MapsLib.map,
         center: point,
         clickable: false,
         zIndex: -1,
@@ -226,19 +235,31 @@ var MapsLib = {
     $.ajax({url: "https://www.googleapis.com/fusiontables/v1/query?sql="+sql+"&callback="+callback+"&key="+MapsLib.googleApiKey, dataType: "jsonp"});
   },
   
-  displayCount: function(whereClause) {
-    var selectColumns = "Count()";
-    MapsLib.query(selectColumns, whereClause,"MapsLib.displaySearchCount");
+  displayCount: function() {
+ 		// wait until this is defined -- the client has loaded the API
+ 		if (gapi.client.fusiontables == null) {
+ 		  console.log("displayCount fusiontables not defined yet");
+ 		  // try again in a bit ?
+ 		  return;
+ 		}
+
+	  var query = 'select count() from "'+MapsLib.fusionTableId + '"';
+    if (MapsLib.whereClause != "") {query += ' where ' + MapsLib.whereClause;}
+    console.log(query);
+		var request = gapi.client.fusiontables.query.sqlGet({'sql': query});
+		request.execute(MapsLib.displaySearchCount);
+		
+    // MapsLib.query(selectColumns, whereClause,"MapsLib.displaySearchCount");
   },
   
   displaySearchCount: function(json) { 
+
     var numRows = 0;
     if (json["rows"] != null)
       numRows = json["rows"][0];
     
     var name = MapsLib.recordNamePlural;
-    if (numRows == 1)
-    name = MapsLib.recordName;
+    if (numRows == 1) { name = MapsLib.recordName; }
     $( "#resultCount" ).fadeOut(function() {
         $( "#resultCount" ).html(MapsLib.addCommas(numRows) + " " + name + " found");
       });
@@ -263,8 +284,38 @@ var MapsLib = {
   	return decodeURIComponent(text);
   },
  
-  querySliderDates: function() {
+  // callback for when the gapi.client.fusiontables are loaded
+  fusiontablesLoaded: function() {
  		console.log('fusiontables client api loaded.');
+ 		// load the dates for the query Slider
+    MapsLib.querySliderDates();
+    // load the query count for the results found display
+    MapsLib.displayCount();
+    // load the legend info
+    MapsLib.queryLegend();
+  },
+
+  queryLegend: function() {
+    var query = "select 'Project Type',Shape,'Icon_Name' from "+MapsLib.fusionTableId+" ORDER BY 'Project Type'";
+    var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
+    request.execute(MapsLib.displayLegend);
+  },
+  
+  displayLegend: function(json) {
+    // console.log(json);
+    
+    // this is adapted from 
+    // http://gmaps-samples.googlecode.com/svn/trunk/fusiontables/dynamic_styling_template.html
+    var legendDiv = document.createElement('div');
+    var legend = new Legend(legendDiv, json);
+    // console.log(legendDiv.innerHTML);
+    legendDiv.index = 1;
+    //MapsLib.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+    MapsLib.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legendDiv);
+  },
+  
+  
+  querySliderDates: function() {
     var query = "select MINIMUM('Expected Completion Date'),MAXIMUM('Expected Completion Date') from "+MapsLib.fusionTableId;
     // console.log(query);
 	  var request = gapi.client.fusiontables.query.sqlGet({'sql': query});
@@ -308,4 +359,82 @@ var MapsLib = {
 		// console.log(ui.value);
 		MapsLib.doSearch();
 	}
+}
+
+// Generate the content for the legend
+function Legend(controlDiv, json) {
+  console.log("Legend!");
+  controlDiv.style.padding = '10px';
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = 'white';
+  controlUI.style.borderStyle = 'solid';
+  controlUI.style.borderWidth = '1px';
+  controlUI.style.width = '150px';
+  controlUI.title = 'Legend';
+  controlDiv.appendChild(controlUI);
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '12px';
+  controlText.style.paddingLeft = '4px';
+  controlText.style.paddingRight = '4px';
+
+  controlText.innerHTML = legendContent(json);
+  controlUI.appendChild(controlText);
+}
+
+function legendContent(json) {
+  // Generate the content for the legend using colors from object
+  var controlTextList = new Array();
+  controlTextList.push('<p><b>');
+  controlTextList.push("Legend");
+  controlTextList.push('</b></p>');
+  // console.log(json);
+  
+  var done_set = {} // project types that are done
+  for(rownum in json["rows"]) {
+    // each row = Project Type, Shape, icon name
+
+		// ignore empties
+    if (json["rows"][rownum][2] == '') { continue; }
+
+		// ignore if we've done it already
+		if (done_set.hasOwnProperty(json["rows"][rownum][0])) { continue; }
+		 
+    console.log(json["rows"][rownum]);
+    var shape = json["rows"][rownum][1];
+    var icon  = json["rows"][rownum][2];
+    var color = json["rows"][rownum][2];
+    
+    // icon images are here: https://groups.google.com/forum/?fromgroups=#!starred/fusion-tables-users-group/Zwoq9xivyXs
+    controlTextList.push('<div style="height: 20px; width: 20px; margin: 3px; float: left;">');
+    if (shape=="Polyline") {
+      controlTextList.push('<div style="margin-top:7px; height:2px; width:20px; opacity:0.6; background-color:'+color+'"></div>');
+    }
+    else if (shape=="Point" && icon=="small_red") {
+    	controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NUlH5v9rF5f+ZoCAwHaig8B8oPhOmKC1NU/P//7Q0DByrqgpSGAtSdOCAry9WRXt9fECK9oIUPXwYFYVV0e2ICJCi20SbFAuyG5uiECUlkKIQmOPng3y30d0d7Lt1bm4w301jQAOgcNoIDad1yOEEAFm9fSv/VqtJAAAAAElFTkSuQmCC">');
+    }
+    else if (shape=="Point" && icon=="small_yellow") {
+      controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAi0lEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NijL7v3p1+v8zZ6rAdGCg4X+g+EyYorS0NNv////PxMCxsRYghbEgRQcOHCjGqmjv3kKQor0gRQ8fPmzHquj27WaQottEmxQLshubopAQI5CiEJjj54N8t3FjFth369ZlwHw3jQENgMJpIzSc1iGHEwB8p5qDBbsHtAAAAABJRU5ErkJggg==">');
+    }
+    else if (shape=="Point" && icon=="small_green") {
+      controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiElEQVR42mNgQIAoIF4NxGegdCCSHAMzEC81izL7n746/X/VmSowbRho+B8oPhOmKM02zfb/TCzQItYCpDAWpOhA8YFirIoK9xaCFO0FKXrY/rAdq6Lm280gRbeJNikWZDc2RUYhRiBFITDHzwf5LmtjFth3GesyYL6bxoAGQOG0ERpO65DDCQDX7ovT++K9KQAAAABJRU5ErkJggg==">');
+    }
+    else if (shape=="Point" && icon=="small_blue") {
+      controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC81M4v6n56++n9V1RkwbWgY+B8oPhOmKM3WNu3/zJn/MbCFRSxIYSxI0YHi4gNYFRUW7gUp2gtS9LC9/SFWRc3Nt0GKbhNtUizIbmyKjIxCQIpCYI6fD/JdVtZGsO8yMtbBfDeNAQ2AwmkjNJzWIYcTAMk+i9OhipcQAAAAAElFTkSuQmCC">');
+    }
+    else if (shape=="Point" && icon=="small_purple") {
+    	controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAi0lEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NMov6vzp99f8zVWfAdKBh4H+g+EyYorQ027T//2f+x8CxFrEghbEgRQcOFB/Aqmhv4V6Qor0gRQ8ftj/Equh2822QottEmxQLshubohCjEJCiEJjj54N8tzFrI9h36zLWwXw3jQENgMJpIzSc1iGHEwBt95qDejjnKAAAAABJRU5ErkJggg==">');
+    }
+    else {
+      console.log("unknown icon: " + json["rows"][rownum][2]);
+    }
+    controlTextList.push('</div>');
+    controlTextList.push(json["rows"][rownum][0]);
+    controlTextList.push('<br style="clear: both;"/>');
+    
+    done_set[json["rows"][rownum][0]] = 1;
+  }
+
+  controlTextList.push('<br />');
+  return controlTextList.join('');
 }

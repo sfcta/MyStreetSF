@@ -66,9 +66,9 @@
 					
 					<tr><th>Funding Source</th>
 					<td id="widget-fundsrc">
-					<input type="checkbox" id='FSLocal' /> Local<br />
-					<input type="checkbox" id='FSRegional' /> Regional<br />
-					<input type="checkbox" id='FSStateFederal' /> State or Federal
+					<input type="checkbox" id='FSPropK' /> Prop K<br />
+					<input type="checkbox" id='FSTFCA' /> TFCA<br />
+					<input type="checkbox" id='FSRegStFed' /> Regional, State or Federal
 					</td></tr>
 															
 					<tr><th>Project Type</th>
@@ -82,6 +82,19 @@
 						<option>Street Repair</option>
 						<option>Transit Enhancements</option>
 						<option>Transit Rehab</option>
+					</select>
+					</td></tr>
+
+					<tr><th>Project Sponsor</th>
+					<td id="widget-project-sponsor">
+					<select id='project-sponsor'>
+						<option>All</option>
+						<option>BART</option>
+						<option>DPW</option>
+						<option>PCJPB</option>
+						<option>Port of SF</option>
+						<option>SFCTA</option>
+						<option>SFMTA</option>
 					</select>
 					</td></tr>
 					
@@ -117,9 +130,9 @@
         </div>
         <div class='span9'>
           <div id='mapCanvas'></div>
-          <p class='pull-right'>
+          <!-- p class='pull-right'>
             Map and <a href='http://derekeder.com/searchable_map_template/'>search template</a> by <a href='http://derekeder.com'>Derek Eder</a>.
-        </p>
+        </p -->
         </div>
       </div>
     </div>
