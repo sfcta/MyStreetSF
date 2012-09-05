@@ -50,7 +50,8 @@ var MapsLib = {
     };
     MapsLib.map = new google.maps.Map($("#mapCanvas")[0],myOptions);
     
-    MapsLib.searchrecords = null;
+    MapsLib.searchrecords1 = null;
+    MapsLib.searchrecords2 = null;
     
     //reset filters
     if ($.address != null) {
@@ -159,21 +160,39 @@ var MapsLib = {
 		MapsLib.whereClause = whereClause;
     console.log("whereClause = " + whereClause);
 
-    //get using all filters
-    MapsLib.searchrecords = new google.maps.FusionTablesLayer({
+    // get using all filters -- polygons on the bottom
+    var polygon_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " CONTAINS 'Polygon'";
+    console.log("polygon_where = " + polygon_where);
+    MapsLib.searchrecords1 = new google.maps.FusionTablesLayer({
       query: {
         from:   MapsLib.fusionTableId,
         select: MapsLib.locationColumn,
-        where:  whereClause
+        where:  polygon_where
       }
     });
-    MapsLib.searchrecords.setMap(map);
+    MapsLib.searchrecords1.setMap(map);
+    
+    // non-polygons on top
+    var rest_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " DOES NOT CONTAIN 'Polygon'";
+    console.log("rest_where = " + rest_where);
+    MapsLib.searchrecords2 = new google.maps.FusionTablesLayer({
+      query: {
+        from:   MapsLib.fusionTableId,
+        select: MapsLib.locationColumn,
+        where:  rest_where
+      }
+    });
+    MapsLib.searchrecords2.setMap(map);
+        
     MapsLib.displayCount();
   },
   
   clearSearch: function() {
-    if (MapsLib.searchrecords != null)
-      MapsLib.searchrecords.setMap(null);
+    if (MapsLib.searchrecords1 != null)
+      MapsLib.searchrecords1.setMap(null);
+    if (MapsLib.searchrecords2 != null)
+      MapsLib.searchrecords2.setMap(null);
+      
     if (MapsLib.addrMarker != null)
       MapsLib.addrMarker.setMap(null);  
     if (MapsLib.searchRadiusCircle != null)
