@@ -103,3 +103,8 @@ div.citywide-info-x {
   padding-right:10px;
   cursor:pointer;
 }
+
+div#resultCount {
+ width:180px;
+ float:left;
+}
