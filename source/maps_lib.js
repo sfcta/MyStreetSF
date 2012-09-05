@@ -366,17 +366,11 @@ function Legend(controlDiv, json) {
   console.log("Legend!");
   controlDiv.style.padding = '10px';
   var controlUI = document.createElement('div');
-  controlUI.style.backgroundColor = 'white';
-  controlUI.style.borderStyle = 'solid';
-  controlUI.style.borderWidth = '1px';
-  controlUI.style.width = '150px';
   controlUI.title = 'Legend';
+  controlUI.id = 'legend';
   controlDiv.appendChild(controlUI);
   var controlText = document.createElement('div');
-  controlText.style.fontFamily = 'Arial,sans-serif';
-  controlText.style.fontSize = '12px';
-  controlText.style.paddingLeft = '4px';
-  controlText.style.paddingRight = '4px';
+	controlText.id = "legendtext";
 
   controlText.innerHTML = legendContent(json);
   controlUI.appendChild(controlText);
@@ -405,30 +399,14 @@ function legendContent(json) {
     var icon  = json["rows"][rownum][2];
     var color = json["rows"][rownum][2];
     
+    if (color[0] != "#") { continue; }
+    
     // icon images are here: https://groups.google.com/forum/?fromgroups=#!starred/fusion-tables-users-group/Zwoq9xivyXs
-    controlTextList.push('<div style="height: 20px; width: 20px; margin: 3px; float: left;">');
-    if (shape=="Polyline") {
-      controlTextList.push('<div style="margin-top:7px; height:2px; width:20px; opacity:0.6; background-color:'+color+'"></div>');
-    }
-    else if (shape=="Point" && icon=="small_red") {
-    	controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NUlH5v9rF5f+ZoCAwHaig8B8oPhOmKC1NU/P//7Q0DByrqgpSGAtSdOCAry9WRXt9fECK9oIUPXwYFYVV0e2ICJCi20SbFAuyG5uiECUlkKIQmOPng3y30d0d7Lt1bm4w301jQAOgcNoIDad1yOEEAFm9fSv/VqtJAAAAAElFTkSuQmCC">');
-    }
-    else if (shape=="Point" && icon=="small_yellow") {
-      controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAi0lEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NijL7v3p1+v8zZ6rAdGCg4X+g+EyYorS0NNv////PxMCxsRYghbEgRQcOHCjGqmjv3kKQor0gRQ8fPmzHquj27WaQottEmxQLshubopAQI5CiEJjj54N8t3FjFth369ZlwHw3jQENgMJpIzSc1iGHEwB8p5qDBbsHtAAAAABJRU5ErkJggg==">');
-    }
-    else if (shape=="Point" && icon=="small_green") {
-      controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiElEQVR42mNgQIAoIF4NxGegdCCSHAMzEC81izL7n746/X/VmSowbRho+B8oPhOmKM02zfb/TCzQItYCpDAWpOhA8YFirIoK9xaCFO0FKXrY/rAdq6Lm280gRbeJNikWZDc2RUYhRiBFITDHzwf5LmtjFth3GesyYL6bxoAGQOG0ERpO65DDCQDX7ovT++K9KQAAAABJRU5ErkJggg==">');
-    }
-    else if (shape=="Point" && icon=="small_blue") {
-      controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC81M4v6n56++n9V1RkwbWgY+B8oPhOmKM3WNu3/zJn/MbCFRSxIYSxI0YHi4gNYFRUW7gUp2gtS9LC9/SFWRc3Nt0GKbhNtUizIbmyKjIxCQIpCYI6fD/JdVtZGsO8yMtbBfDeNAQ2AwmkjNJzWIYcTAMk+i9OhipcQAAAAAElFTkSuQmCC">');
-    }
-    else if (shape=="Point" && icon=="small_purple") {
-    	controlTextList.push('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAi0lEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NMov6vzp99f8zVWfAdKBh4H+g+EyYorQ027T//2f+x8CxFrEghbEgRQcOFB/Aqmhv4V6Qor0gRQ8ftj/Equh2822QottEmxQLshubohCjEJCiEJjj54N8tzFrI9h36zLWwXw3jQENgMJpIzSc1iGHEwBt95qDejjnKAAAAABJRU5ErkJggg==">');
-    }
-    else {
-      console.log("unknown icon: " + json["rows"][rownum][2]);
-    }
+    controlTextList.push('<div id="iconbox">');
+    // always do polylines
+	  controlTextList.push('<div id="lineicon" style="background-color:'+color+'"></div>');
     controlTextList.push('</div>');
+    
     controlTextList.push(json["rows"][rownum][0]);
     controlTextList.push('<br style="clear: both;"/>');
     

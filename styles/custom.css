@@ -58,3 +58,31 @@ table#filters th
 select#ddlRadius { width:110px; }
 
 #slider { margin: 4px 4px; }
+
+h1 {
+  color: rgb(99,115,102);
+}
+
+div#legend {
+ width:150px;
+ background-color:white;
+}
+
+div#legendtext {
+ padding: 4px;
+ background-color:white; 
+}
+
+div#iconbox {
+ height: 20px;
+ width: 20px;
+ margin: 4px;
+ float: left;
+}
+
+div#lineicon {
+ margin-top:7px;
+ height:3px;
+ width:20px;
+ opacity:0.6; 
+}
