@@ -293,6 +293,8 @@ var MapsLib = {
     MapsLib.displayCount();
     // load the legend info
     MapsLib.queryLegend();
+    // load the citywide projects
+    MapsLib.queryCitywide();
   },
 
   queryLegend: function() {
@@ -314,6 +316,49 @@ var MapsLib = {
     MapsLib.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legendDiv);
   },
   
+  // query the citywide project (those that have Geometry) for display
+  queryCitywide: function() {
+    MapsLib.columnNames = ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
+    	'Current Phase', 'Phase Completion Date', 'Expected Completion Date', 'Project Details Page'];
+    
+  	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId+" WHERE District LIKE 'City%'";
+  	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
+  	request.execute(MapsLib.displayCitywide);
+  }, 
+  
+  // create the citywide project list html
+  displayCitywide: function(json) {
+  	// console.log("displayCitywide");
+  	var li_list = "";
+  	var link_col = MapsLib.columnNames.length-1;
+  	
+	  for(rownum = 0; rownum < json["rows"].length; rownum++) {
+	  	var divHtml = '<div id="citywide-' + rownum + '" class="googft-info-window citywide-info-window" style="display:none">'
+	  	divHtml += '<div class="citywide-info-x" onclick="HideContent(\'citywide-'+rownum+'\'); return true;"><img src="styles/x.png"></div>';
+	  	divHtml += '<table class="map_info">';
+	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-1; colnum++) {
+
+				// skip project location
+				if (MapsLib.columnNames[colnum] == 'Project Location') { continue; }
+				
+	  	  divHtml += '<tr><th>' + MapsLib.columnNames[colnum] + '</th><td>';
+
+	  	  // link to the project details
+	  	  if (colnum==0 && json["rows"][rownum][link_col].length > 0) {
+	  	  	divHtml += '<a target="_blank" href="' + json["rows"][rownum][link_col] + '">';
+		  	}
+	  	  divHtml += json["rows"][rownum][colnum];
+	  	  if (colnum==0 && json["rows"][rownum][link_col].length > 0) {
+					divHtml += '</a>';
+				}
+	  	  divHtml += '</td></tr>';
+	  	}
+	  	divHtml += '</table></div>';
+	  	li_list += '<li><a onclick="ShowContent(\'citywide-'+rownum+'\'); return true;" ';
+	  	li_list +=        'href="javascript:ShowContent(\'citywide-'+rownum+'\');">'+json["rows"][rownum][0]+'</a></li>' + divHtml + '\n';
+		}
+		$('#citywide-list').html(li_list);
+  },
   
   querySliderDates: function() {
     var query = "select MINIMUM('Expected Completion Date'),MAXIMUM('Expected Completion Date') from "+MapsLib.fusionTableId;
@@ -363,7 +408,7 @@ var MapsLib = {
 
 // Generate the content for the legend
 function Legend(controlDiv, json) {
-  console.log("Legend!");
+  // console.log("Legend!");
   controlDiv.style.padding = '10px';
   var controlUI = document.createElement('div');
   controlUI.title = 'Legend';
@@ -394,7 +439,7 @@ function legendContent(json) {
 		// ignore if we've done it already
 		if (done_set.hasOwnProperty(json["rows"][rownum][0])) { continue; }
 		 
-    console.log(json["rows"][rownum]);
+    // console.log(json["rows"][rownum]);
     var shape = json["rows"][rownum][1];
     var icon  = json["rows"][rownum][2];
     var color = json["rows"][rownum][2];
@@ -415,4 +460,12 @@ function legendContent(json) {
 
   controlTextList.push('<br />');
   return controlTextList.join('');
+}
+
+function HideContent(id) {
+	$("div#"+id).fadeOut();
+}
+
+function ShowContent(id) {
+	$("div#"+id).fadeIn();
 }

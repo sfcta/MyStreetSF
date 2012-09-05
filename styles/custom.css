@@ -86,3 +86,20 @@ div#lineicon {
  width:20px;
  opacity:0.6; 
 }
+
+div.citywide-info-window {
+  position:absolute;
+  left:350px;
+  top:600px;
+  width:650px;
+  border:1px solid #aaaaaa;
+  background-color:white;
+  padding:5px;
+  z-index:1000;
+}
+
+div.citywide-info-x {
+  float:right;
+  padding-right:10px;
+  cursor:pointer;
+}

@@ -127,6 +127,14 @@
             <button class='btn' id='reset'>Reset</button>
           </div>
           <p class='alert alert-info lead' id='resultCount'></p>
+          <div id="citywide">
+					<h3>Citywide Projects and Plans</h3>
+          Some SFCTA sponsored projects and plans are not shown on this map.  For example, we also work in conjunction with organizations such
+          as Caltrain and fund various Citywide Programs, Bay Area Regional Plans, and the comprehensive Countywide Transportation Plan.
+          These types projects are difficult to visualize on a map, but can still be accessed on this page below.
+          <ul id="citywide-list">
+          </ul>
+          </div><!-- /citywide -->
         </div>
         <div class='span9'>
           <div id='mapCanvas'></div>
@@ -134,8 +142,26 @@
             Map and <a href='http://derekeder.com/searchable_map_template/'>search template</a> by <a href='http://derekeder.com'>Derek Eder</a>.
         </p -->
         </div>
-      </div>
-    </div>
+      </div><!--/row-->  
+
+      <div class="row-fluid">
+        <div class="span3" id="contact"><br />
+        <strong>Contact Info</strong><br />
+        If you have any questions or comments regarding the SFCTA interactive map, please contact <a href="mailto:anthony.adams@sfcta.org">Anthony Adams</a>
+        at the San Francisco County Transportation Authority.    
+        </div>
+        <div class="span9" id="disclaimer"><br />
+        <strong>Disclaimer</strong>  Please Note: This map is not designed to show all transportation projects within the County, only projects
+        funded through the San Francisco County Transportation Authority are represented.  If you wish to search for other transportation or
+        development projects within San Francisco you can also visit these other government agencies:
+        <a target="_blank" href="http://www.sfmta.com/cms/home/sfmta.php">San Francisco Municipal Transportation Agency</a>,
+        <a target="_blank" href="https://maps.google.com/maps/ms?msid=205892305473316085509.00047bd126d0d68149490&msa=0&ll=37.773157,-122.457561&spn=0.092675,0.2108">SF Dept. of Public Works</a>, 
+        <a target="_blank" href="http://www.sf-planning.org/index.aspx?page=2426">City of SF Planning Dept.</a>,
+        <a target="_blank" href="http://www.caltrain.com/projectsplans.html">Caltrain</a>.  
+        </div>
+      </div><!--/row-->  
+    </div><!--/.fluid-container-->
+    
     <script type="text/javascript" src="source/jquery.address.min.js"></script>
     <script type='text/javascript'>		        
       //<![CDATA[
@@ -145,7 +171,7 @@
         
         $(window).resize(function () {
           var h = $(window).height(),
-            offsetTop = 130; // Calculate the top offset
+            offsetTop = 200; // Calculate the top offset
         
           $('#mapCanvas').css('height', (h - offsetTop));
         }).resize();
