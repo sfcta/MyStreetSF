@@ -340,7 +340,7 @@ var MapsLib = {
     MapsLib.columnNames = ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
     	'Current Phase', 'Phase Completion Date', 'Expected Completion Date', 'Project Details Page'];
     
-  	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId+" WHERE District LIKE 'City%'";
+  	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId+" WHERE District LIKE 'City%' ORDER BY 'Project Name'";
   	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
   	request.execute(MapsLib.displayCitywide);
   }, 
