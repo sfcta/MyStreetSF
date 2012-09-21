@@ -18,7 +18,7 @@ var MapsLib = {
   
   //the encrypted Table ID of your Fusion Table (found under File => About)
   //NOTE: numeric IDs will be depricated soon
-  fusionTableId:      "1-pdSEaE-xu36mhCGCt41U8m--5vwaM7ww-kz6Ko",  
+  fusionTableId:      "18tUOxF3J_-eXe2Z6F1VQh0emIusJKYgKhtKankc",
   
   //*New Fusion Tables Requirement* API key. found at https://code.google.com/apis/console/      
   googleApiKey:       "AIzaSyDSscDrdYK3lENjefyjoBof_JjXY5LJLRo",        
@@ -49,6 +49,25 @@ var MapsLib = {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     MapsLib.map = new google.maps.Map($("#mapCanvas")[0],myOptions);
+    
+    MapsLib.infoBox = new InfoBox({
+    	content:"fuzzyman",
+    	disableAutoPan:false,
+    	maxWidth:0,
+    	pixelOffset:new google.maps.Size(-140,0),
+    	zIndex:null,
+			boxStyle: { 
+				background:"white",
+        opacity: 1.0,
+        width: "688px"
+      },    	
+			closeBoxMargin:"10px 2px 2px 2px",
+			closeBoxURL:"http://www.google.com/intl/en_us/mapfiles/close.gif",
+      infoBoxClearance: new google.maps.Size(1, 1),
+      isHidden: false,
+      pane: "floatPane",
+      enableEventPropagation: false
+    });			
     
     MapsLib.searchrecords1 = null;
     MapsLib.searchrecords2 = null;
@@ -115,7 +134,7 @@ var MapsLib = {
 
 		//-----filter by completion date-------
 		if (MapsLib.slideDate != null) {
-			whereClause += " AND 'Expected Completion Date' <= '" + 
+			whereClause += " AND 'Project Completion Expected' <= '" + 
 				MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
 		}
     //-----end of filter by completion date-------		
@@ -168,9 +187,13 @@ var MapsLib = {
         from:   MapsLib.fusionTableId,
         select: MapsLib.locationColumn,
         where:  polygon_where
-      }
+      },
+      options: {
+      	suppressInfoWindows: true
+      },
     });
     MapsLib.searchrecords1.setMap(map);
+    google.maps.event.addListener(MapsLib.searchrecords1, 'click', MapsLib.layer_clicked);
     
     // non-polygons on top
     var rest_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " DOES NOT CONTAIN 'Polygon'";
@@ -314,6 +337,10 @@ var MapsLib = {
     MapsLib.queryLegend();
     // load the citywide projects
     MapsLib.queryCitywide();
+    
+    var googft = $("div.googft-info-window table td a");
+    console.log(googft);
+    console.log(googft.html());
   },
 
   queryLegend: function() {
@@ -338,7 +365,7 @@ var MapsLib = {
   // query the citywide project (those that have Geometry) for display
   queryCitywide: function() {
     MapsLib.columnNames = ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
-    	'Current Phase', 'Phase Completion Date', 'Expected Completion Date', 'Project Details Page'];
+    	'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page'];
     
   	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId+" WHERE District LIKE 'City%' ORDER BY 'Project Name'";
   	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
@@ -348,6 +375,7 @@ var MapsLib = {
   // create the citywide project list html
   displayCitywide: function(json) {
   	// console.log("displayCitywide");
+  	// console.log(json);
   	var li_list = "";
   	var link_col = MapsLib.columnNames.length-1;
   	
@@ -380,7 +408,7 @@ var MapsLib = {
   },
   
   querySliderDates: function() {
-    var query = "select MINIMUM('Expected Completion Date'),MAXIMUM('Expected Completion Date') from "+MapsLib.fusionTableId;
+    var query = "select MINIMUM('Project Completion Expected'),MAXIMUM('Project Completion Expected') from "+MapsLib.fusionTableId;
     // console.log(query);
 	  var request = gapi.client.fusiontables.query.sqlGet({'sql': query});
 		request.execute(MapsLib.setSliderMinMaxDates);
@@ -422,7 +450,19 @@ var MapsLib = {
 	slideChange: function(event, ui) {
 		// console.log(ui.value);
 		MapsLib.doSearch();
+	},
+	
+	layer_clicked: function(event) {
+		console.log("map_clicked");
+		console.log(event);
+		console.log(MapsLib.infoBox);
+		
+		var text = event.infoWindowHtml;
+		MapsLib.infoBox.setContent(text);
+		MapsLib.infoBox.setPosition(event.latLng);
+		MapsLib.infoBox.open(MapsLib.map);
 	}
+	
 }
 
 // Generate the content for the legend
