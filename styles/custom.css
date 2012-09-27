@@ -104,6 +104,34 @@ div.citywide-info-x {
   cursor:pointer;
 }
 
+div.infoBoxRelative {
+ position: relative;
+}
+
+/* close button on top */
+div.infoBox img {
+ z-index: 12;
+}
+
+/* extra padding for the pointer */
+div.infoTable {
+ z-index: 1;
+}
+
+div.googft-info-window {
+ background: white;
+ padding:15px;
+ border: 1px solid #ABABAB; 
+}
+
+div.infoPointer {
+ position:absolute; 
+ left:300px;
+ bottom:-70px;
+ z-index: 10;
+ overflow:hidden;
+}
+
 div#resultCount {
  width:150px;
  float:left;

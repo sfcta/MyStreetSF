@@ -19,6 +19,7 @@ var MapsLib = {
   //the encrypted Table ID of your Fusion Table (found under File => About)
   //NOTE: numeric IDs will be depricated soon
   fusionTableId:      "18tUOxF3J_-eXe2Z6F1VQh0emIusJKYgKhtKankc",
+  fusionTableId_district: "195G1SlISdfHwHG8PazCkoZA9JVQaeTtqeOcehs0",
   
   //*New Fusion Tables Requirement* API key. found at https://code.google.com/apis/console/      
   googleApiKey:       "AIzaSyDSscDrdYK3lENjefyjoBof_JjXY5LJLRo",        
@@ -31,7 +32,8 @@ var MapsLib = {
   
   searchRadius:       805,            //in meters ~ 1/2 mile
   defaultZoom:        12,             //zoom level when map is loaded (bigger is more zoomed in)
-  currentPinpoint: null,
+  currentPinpoint: 		null,
+  marker: 						null,						// for currently clicked item
   
   initialize: function() {
     if (gapi.client.fusiontables == null) {
@@ -50,24 +52,29 @@ var MapsLib = {
     };
     MapsLib.map = new google.maps.Map($("#mapCanvas")[0],myOptions);
     
+    // we will render our own info box to have more control 
+    // for popups and also to highlight the selected item
     MapsLib.infoBox = new InfoBox({
+	    alignBottom:true,
     	content:"fuzzyman",
     	disableAutoPan:false,
+    	infoBoxClearance:10,
     	maxWidth:0,
-    	pixelOffset:new google.maps.Size(-140,0),
+    	pixelOffset:new google.maps.Size(-307,-70),
     	zIndex:null,
 			boxStyle: { 
-				background:"white",
+				// background:"white",
         opacity: 1.0,
-        width: "688px"
-      },    	
-			closeBoxMargin:"10px 2px 2px 2px",
+        width: "688px",
+      },
+			closeBoxMargin:"10px 10px 2px 2px",
 			closeBoxURL:"http://www.google.com/intl/en_us/mapfiles/close.gif",
       infoBoxClearance: new google.maps.Size(1, 1),
       isHidden: false,
       pane: "floatPane",
       enableEventPropagation: false
-    });			
+    });
+    google.maps.event.addDomListener(MapsLib.infoBox, 'closeclick', MapsLib.infoBoxCloseClick);
     
     MapsLib.searchrecords1 = null;
     MapsLib.searchrecords2 = null;
@@ -203,9 +210,38 @@ var MapsLib = {
         from:   MapsLib.fusionTableId,
         select: MapsLib.locationColumn,
         where:  rest_where
-      }
+      },
+      options: {
+      	suppressInfoWindows: true
+      },
     });
     MapsLib.searchrecords2.setMap(map);
+    google.maps.event.addListener(MapsLib.searchrecords2, 'click', MapsLib.layer_clicked);
+    
+    // district boundary if a district is used for filtering
+		var district = $("#district").val();   
+		if (district != "All") {
+		
+			if (MapsLib.districtLayer) {
+				MapsLib.districtLayer.setMap(null);
+				MapsLib.districtLayer = null;
+			}
+		
+			MapsLib.districtLayer = new google.maps.FusionTablesLayer({
+				query: {
+					from:	MapsLib.fusionTableId_district,
+					select: "geometry",
+					where: "name = " + district
+				}
+			});
+			MapsLib.districtLayer.setMap(map);		
+		}
+		else {
+			if (MapsLib.districtLayer) {
+				MapsLib.districtLayer.setMap(null);
+				MapsLib.districtLayer = null;
+			}
+		}
         
     MapsLib.displayCount();
   },
@@ -349,9 +385,14 @@ var MapsLib = {
     request.execute(MapsLib.displayLegend);
   },
   
+  redisplayLegend: function() {
+  	if (MapsLib.legendJson) {
+  		MapsLib.displayLegend(MapsLib.legendJson);
+  	}
+  },
+  
   displayLegend: function(json) {
-    // console.log(json);
-    
+		MapsLib.legendJson = json;    
     // this is adapted from 
     // http://gmaps-samples.googlecode.com/svn/trunk/fusiontables/dynamic_styling_template.html
     var legendDiv = document.createElement('div');
@@ -381,7 +422,7 @@ var MapsLib = {
   	
 	  for(rownum = 0; rownum < json["rows"].length; rownum++) {
 	  	var divHtml = '<div id="citywide-' + rownum + '" class="googft-info-window citywide-info-window" style="display:none">'
-	  	divHtml += '<div class="citywide-info-x" onclick="HideContent(\'citywide-'+rownum+'\'); return true;"><img src="styles/x.png"></div>';
+	  	divHtml += '<div class="citywide-info-x" onclick="HideContent(\'citywide-'+rownum+'\'); return true;"><img src="http://www.google.com/intl/en_us/mapfiles/close.gif"></div>';
 	  	divHtml += '<table class="map_info">';
 	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-1; colnum++) {
 
@@ -453,14 +494,69 @@ var MapsLib = {
 	},
 	
 	layer_clicked: function(event) {
-		console.log("map_clicked");
+		console.log("layer_clicked");
 		console.log(event);
-		console.log(MapsLib.infoBox);
+		console.log(event.row['Project Name']['value']);
+		console.log(event.row['Icon_Name']['value']);
+		console.log(event.row['Shape']['value']);
+		// console.log(MapsLib.infoBox);
 		
-		var text = event.infoWindowHtml;
+		var text = '<div class="infoBoxRelative"><div class="infoTable">' + event.infoWindowHtml + '</div><div class="infoPointer"><img src="styles/pointer.png"></div></div>';
 		MapsLib.infoBox.setContent(text);
 		MapsLib.infoBox.setPosition(event.latLng);
 		MapsLib.infoBox.open(MapsLib.map);
+		
+		if (MapsLib.marker) {
+			MapsLib.marker.setMap(null);
+			MapsLib.marker = null;
+		}
+		if (MapsLib.highlightRecord) {
+			MapsLib.highlightRecord.setMap(null);
+			MapsLib.highlightRecord = null;
+		}
+		
+		// add a special marker for this
+		if (event.row['Shape']['value'] == "Point") {
+			var markerImage = new google.maps.MarkerImage(
+				"styles/" + event.row['Icon_Name']['value']+"_highlight.png",
+				new google.maps.Size(13,13),
+			 	new google.maps.Point(0,0),
+			 	new google.maps.Point(7,7)
+			);
+				
+				
+			MapsLib.marker = new google.maps.Marker({
+				map:MapsLib.map,
+				position:event.latLng,
+				icon:markerImage,
+			});
+		} else {
+			MapsLib.highlightRecord = new google.maps.FusionTablesLayer({
+      	query: {
+        	from:   MapsLib.fusionTableId,
+        	select: MapsLib.locationColumn,
+        	where:  "'Project Name'='" + event.row['Project Name']['value'] + "'"
+      	},
+      	options: {suppressInfoWindows: true},
+	      styles: [{ polygonOptions: {strokeColor:"#fff460", strokeWeight:"2", fillOpacity:1.0},
+	      					 polylineOptions: {strokeWeight:6, strokeOpacity:1.0}
+	      				}]
+ 	    });
+	    MapsLib.highlightRecord.setMap(MapsLib.map); 
+    }
+	},
+	
+	infoBoxCloseClick : function() {
+		// console.log("MapsLib.infoBoxContentChanged");
+		// console.log($("div.infoBox div.googft-info-window tr:first"));
+		if (MapsLib.marker) {
+			MapsLib.marker.setMap(null);
+			MapsLib.marker = null;
+		}
+		if (MapsLib.highlightRecord) {
+			MapsLib.highlightRecord.setMap(null);
+			MapsLib.highlightRecord = null;
+		}		
 	}
 	
 }
