@@ -41,9 +41,7 @@ var MapsLib = {
       gapi.client.load('fusiontables', 'v1', MapsLib.fusiontablesLoaded);
 
     }
-  
-    $( "#resultCount" ).html("");
-  
+    
     geocoder = new google.maps.Geocoder();
     var myOptions = {
       zoom: MapsLib.defaultZoom,
@@ -88,10 +86,11 @@ var MapsLib = {
     else $("#ddlRadius").val(MapsLib.searchRadius);
     $("#district").prop("selectedIndex", 0);
     $("#project-type").prop("selectedIndex", 0);
+    $("#project-sponsor").prop("selectedIndex", 0);
     $(":checkbox").prop("checked", true);
 		$("#slider").slider( "option", "value", 100 );
+		$("#txtSearchAddress").val('');
 		MapsLib.slide(null, null);
-    $("#resultCount").hide();
      
     //run the default search
     MapsLib.doSearch();
@@ -338,10 +337,7 @@ var MapsLib = {
     
     var name = MapsLib.recordNamePlural;
     if (numRows == 1) { name = MapsLib.recordName; }
-    $( "#resultCount" ).fadeOut(function() {
-        $( "#resultCount" ).html(MapsLib.addCommas(numRows) + " " + name + " found");
-      });
-    $( "#resultCount" ).fadeIn();
+    $( "#resultCount" ).html(MapsLib.addCommas(numRows) + " " + name + " found");
   },
   
   addCommas: function(nStr) {

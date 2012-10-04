@@ -58,128 +58,160 @@
   </head>
   <body>
     <div class='container-fluid'>
-      <div class='page-header'>
-        <h1>
-          <a href='#'>SFCTA Interactive Map</a> 
-          <small>Active Projects</small>
-        </h1>
-      </div>
       <div class='row-fluid'>
-        <div class='span3'>
-          <div class='well'>
-          
-					<table id='filters'>
-					<tr><th>District</th>
-					<td id="widget-district">
-					<select id='district'>
-						<option>All</option>
-						<option>1</option>
-						<option>2</option>
-						<option>3</option>
-						<option>4</option>
-						<option>5</option>
-						<option>6</option>
-						<option>7</option>
-						<option>8</option>
-						<option>9</option>
-						<option>10</option>
-						<option>11</option>
-					</select>
-					</td></tr>
-					
-					<tr><th>Funding Source</th>
-					<td id="widget-fundsrc">
-					<input type="checkbox" id='FSPropK' /> Prop K<br />
-					<input type="checkbox" id='FSTFCA' /> TFCA<br />
-					<input type="checkbox" id='FSRegStFed' /> Regional, State or Federal
-					</td></tr>
-															
-					<tr><th>Project Type</th>
-					<td id="widget-project-type">
-					<select id='project-type'>
-						<option>All</option>
-						<option>Bike</option>
-						<option>Major Capital Projects</option>
-						<option>Pedestrian Safety</option>
-						<option>Plans and Studies</option>
-						<option>Signs and Signals</option>
-						<option>Street Repair</option>
-						<option>Transit Enhancements</option>
-						<option>Transit Rehab</option>
-					</select>
-					</td></tr>
-
-					<tr><th>Project Sponsor</th>
-					<td id="widget-project-sponsor">
-					<select id='project-sponsor'>
-						<option>All</option>
-						<option>BART</option>
-						<option>DPW</option>
-						<option>PCJPB</option>
-						<option>Port of SF</option>
-						<option>SFCTA</option>
-						<option>SFMTA</option>
-					</select>
-					</td></tr>
-					
-					<tr><th>Within</th>
-					<td id="widget-within">
-					<select id='ddlRadius'>
-						<option value='400'>2 blocks</option>
-						<option value='805'>1/2 mile</option>
-						<option value='1610'>1 mile</option>
-						<option value='3220'>2 miles</option>
-					</select>
-					
-					<span>of</span>
-					<div class='input-addr' style="display:inline">
-					<input class='input-block-level' type="text" placeholder='Enter an address or an intersection' id="txtSearchAddress" />(<a href='#' id="findMe">find me</a>)
-					</div>
-					</td></tr>
-					
-					<tr><th>Project Completion Expected</th>
-					<td><span>before</span> <span id="slide-date"></span><div id="slider"></div>
-					<span style="float:left; font-size:9pt;" id="slide-min-date"></span><span style="float:right; font-size:9pt;" id="slide-max-date"></span>
-					</td></tr>
-					</table>
-          
-            <hr />
-          <div class='alert alert-info lead' id='resultCount'></div>
-          <div style="float:right"><button class='btn' id='reset'>Reset</button></div>
-          <div style="clear:both";></div>
-          </div>
-          <div id="citywide">
-					<h3>Citywide Projects and Plans</h3>
-          Some SFCTA sponsored projects and plans are not shown on this map.  For example, we also work in conjunction with organizations such
-          as Caltrain and fund various Citywide Programs, Bay Area Regional Plans, and the comprehensive Countywide Transportation Plan.
-          These types projects are difficult to visualize on a map, but can still be accessed on this page below.
-          <ul id="citywide-list">
-          </ul>
-          </div><!-- /citywide -->
+        <div class='span6'>
+          <h1 class='contentheading'>Active SFCTA Projects | Interactive Map</h1>
+          <p>Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it.
+          Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it.
+          Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it. 
+          </p>
+          <h3>Location-specific Projects and Plans</h3>
+          <p>Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it. 
+          Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it.
+          </p>
+          <h3>Citywide Projects and Plans</h3>
+          <p>Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it.
+          </p> 
         </div>
-        <div class='span9'>
-          <div id='mapCanvas'></div>
-          <!-- p class='pull-right'>
-            Map and <a href='http://derekeder.com/searchable_map_template/'>search template</a> by <a href='http://derekeder.com'>Derek Eder</a>.
-        </p -->
+        <div class='span6'>
+    
+          <table><tr>
+          <td>
+          <label for='district'>District</label>
+          <select id='district' name='district'>
+            <option>All</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+          </select>
+          </td>
+          
+          <td style="padding-left:20px"><label for='fundsrc'>Funding Source</label></td>
+          <td>
+            <input type="checkbox" id='FSPropK' /> Prop K<br />
+            <input type="checkbox" id='FSTFCA' /> TFCA<br />
+            <input type="checkbox" id='FSRegStFed' /> Regional, State or Federal          
+          </td>
+          </tr></table>
+
+          <div style="clear:both"></div>
+          <hr />
+          
+          <table style="width:100%">                              
+          <tr>
+          
+          <td>
+          <label for='project-type'>Project Type</label><br />
+          <select id='project-type'>
+            <option>All</option>
+            <option>Bike</option>
+            <option>Major Capital Projects</option>
+            <option>Pedestrian Safety</option>
+            <option>Plans and Studies</option>
+            <option>Signs and Signals</option>
+            <option>Street Repair</option>
+            <option>Transit Enhancements</option>
+            <option>Transit Rehab</option>
+          </select>
+          </td>
+
+          <td>
+          <label for='project-sponsor'>Project Sponsor</label><br />
+          <select id='project-sponsor'>
+            <option>All</option>
+            <option>BART</option>
+            <option>DPW</option>
+            <option>PCJPB</option>
+            <option>Port of SF</option>
+            <option>SFCTA</option>
+            <option>SFMTA</option>
+          </select>
+          </td>
+          </tr>
+          
+          <tr>
+          <td>
+          <label for='ddlRadius'>Within</label><br />
+          <select id='ddlRadius'>
+            <option value='400'>2 blocks</option>
+            <option value='805'>1/2 mile</option>
+            <option value='1610'>1 mile</option>
+            <option value='3220'>2 miles</option>
+          </select>
+          </td>
+          
+          <td>
+          <div class='input-addr'>
+          of (<a href='#' id="findMe">find me</a>)<input class='input-block-level' type="text" placeholder='Enter an address or an intersection' id="txtSearchAddress" />
+          </div>
+          </td>
+          
+          </tr>
+          
+          <tr>
+          <td>
+          <label for='slide-date'>Project Completion Expected<label><br />
+          <span>before</span> <span id="slide-date"></span><div id="slider"></div>
+          <span style="float:left; font-size:9pt;" id="slide-min-date"></span><span style="float:right; font-size:9pt;" id="slide-max-date"></span>
+          </td>
+          
+          <td>
+          <div class='results' style='text-align:center'>
+            <div class='alert alert-info lead' id='resultCount'>results found</div>
+            <div style="clear:both"></div>
+            <div><button class='btn' id='reset'>Reset</button></div>
+          </div>
+          </td>
+          </tr>
+          </table>
+                            
+        </div>
+      </div>
+      
+      <div class='row-fluid'>
+        <div class='span12'>
+          <div id='mapCanvas' style="height:650px"></div>
         </div>
       </div><!--/row-->  
 
       <div class="row-fluid">
-        <div class="span3" id="contact"><br />
-        <strong>Contact Info</strong><br />
-        If you have any questions or comments regarding the SFCTA interactive map, please contact <a href="mailto:anthony.adams@sfcta.org">Anthony Adams</a>
-        at the San Francisco County Transportation Authority.    
+        <div class='span3'>
+
+          <h3>Citywide Projects and Plans</h3>
+          Some SFCTA sponsored projects and plans are not shown on this map.  For example, we also work in conjunction with organizations such
+          as Caltrain and fund various Citywide Programs, Bay Area Regional Plans, and the comprehensive Countywide Transportation Plan.
+          These types projects are difficult to visualize on a map, but can still be accessed on this page below.
+      
         </div>
-        <div class="span9" id="disclaimer"><br />
-        <strong>Disclaimer</strong>  Please Note: This map is not designed to show all transportation projects within the County, only projects
+        <div class='span3'>
+          <div id="citywide"><ul id="citywide-list"></ul></div>
+        </div>
+        <div class='span3'>Bunnies</div>
+      </div><!--/row-->  
+
+      <div class="row-fluid">
+        <div class="span12" id="contact"><br />
+        <strong>Contact Info</strong><br />
+        <p>If you have any questions or comments regarding the SFCTA interactive map, please contact <a href="mailto:anthony.adams@sfcta.org">Anthony Adams</a>
+        at the San Francisco County Transportation Authority.</p>
+
+        <p><strong>Disclaimer</strong>  Please Note: This map is not designed to show all transportation projects within the County, only projects
         funded through the San Francisco County Transportation Authority are represented.  If you wish to search for other transportation or
         development projects within San Francisco you can also visit these other government agencies:
         <a target="_blank" href="http://www.sfmta.com/cms/home/sfmta.php">San Francisco Municipal Transportation Agency</a>,
         <a target="_blank" href="https://maps.google.com/maps/ms?msid=205892305473316085509.00047bd126d0d68149490&msa=0&ll=37.773157,-122.457561&spn=0.092675,0.2108">SF Dept. of Public Works</a>, 
         <a target="_blank" href="http://www.sf-planning.org/index.aspx?page=2426">City of SF Planning Dept.</a>,
-        <a target="_blank" href="http://www.caltrain.com/projectsplans.html">Caltrain</a>.  
-        </div>
+        <a target="_blank" href="http://www.caltrain.com/projectsplans.html">Caltrain</a>.
+        </p>
+        </div><!--/span12-->
       </div><!--/row-->  
     </div><!--/.fluid-container-->
     
@@ -196,13 +228,6 @@
 		  		}      		
       		
   			});
-        
-        $(window).resize(function () {
-          var h = $(window).height(),
-            offsetTop = 200; // Calculate the top offset
-        
-          $('#mapCanvas').css('height', (h - offsetTop));
-        }).resize();
         
         $(function() {
           // MapsLib.initialize();

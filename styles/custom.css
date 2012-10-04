@@ -31,6 +31,57 @@ a { color: #4B58A6; }
 .filter-red { background-color: #FB6353; }
 
 /* lmz added */
+body {
+ font-family: "Trebuchet MS", Helvetica, sans-serif;
+ font-size: 69%;
+ color: #4F4F4F;
+}
+#content h1, .contentheading, div.componentheading {
+ color: #EA790D;
+ text-transform: uppercase;
+ font-weight: bold;
+ font-size: 1.4em;
+ padding:1em 0 .5em 0;
+}
+
+label {
+ font-weight: bold;
+}
+
+div.alert-info {
+ width:170px;
+ margin: 10px auto;
+ text-align: center;
+ font-size: 1.6em;
+ color: #3A87AD;
+ background-color: #D9EDF7;
+ border: 1px solid #BCE8F1;
+ -webkit-border-radius: 4px;
+ padding: 8px;
+ text-shaddow: 0 1px 0 rgba(255,255,255,0.5);
+}
+
+button#reset {
+ background-color: #FFDB94;
+ text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+ cursor: pointer;
+ -webkit-border-radius: 4px;
+ -webkit-appearance: none;
+ padding: 8px;
+}
+
+h3 {
+ color: #EA790D;
+ font-size: 1.2em;
+ font-weight: bold;
+ line-height: 1.1em;
+ margin: 0.8em 0;
+}
+
+table.map_info {
+ border-spacing: 0px;
+}
+
 table.map_info, table.map_info tr { font-size:10pt; }
 
 table.map_info th {
@@ -57,7 +108,7 @@ table#filters th
 
 select#ddlRadius { width:110px; }
 
-#slider { margin: 4px 4px; }
+#slider { margin: 4px 14px; }
 
 h1 {
   color: rgb(99,115,102);
@@ -66,6 +117,7 @@ h1 {
 div#legend {
  width:150px;
  background-color:white;
+ border: 1px solid #aaaaaa;
 }
 
 div#legendtext {
@@ -130,10 +182,4 @@ div.infoPointer {
  bottom:-70px;
  z-index: 10;
  overflow:hidden;
-}
-
-div#resultCount {
- width:150px;
- float:left;
- font-size: 16px;
 }
