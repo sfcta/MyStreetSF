@@ -141,8 +141,8 @@ div#lineicon {
 
 div.citywide-info-window {
   position:absolute;
-  left:350px;
-  top:600px;
+  left:200px;
+  bottom:130px;
   width:650px;
   border:1px solid #aaaaaa;
   background-color:white;
@@ -182,4 +182,12 @@ div.infoPointer {
  bottom:-70px;
  z-index: 10;
  overflow:hidden;
+}
+
+ul#citywide-types li.selected {
+ background-color: #637366;
+}
+
+ul#citywide-types li.selected a {
+ color:white;
 }

@@ -368,7 +368,7 @@ var MapsLib = {
     // load the legend info
     MapsLib.queryLegend();
     // load the citywide projects
-    MapsLib.queryCitywide();
+    MapsLib.queryCitywideTypes();
     
     var googft = $("div.googft-info-window table td a");
     console.log(googft);
@@ -399,12 +399,46 @@ var MapsLib = {
     MapsLib.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legendDiv);
   },
   
+  queryCitywideTypes: function() {
+    var query = "select 'Project Type' from " + MapsLib.fusionTableId + " WHERE District Like 'City%' ORDER BY 'Project Type'";
+    var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
+    request.execute(MapsLib.displayCitywideTypes);
+  },
+  
+  displayCitywideTypes: function(json) {
+    var li_list = "";
+    prev_type = '';
+    for (rownum = 0; rownum < json["rows"].length; rownum++) {
+      proj_type = json["rows"][rownum][0];
+      proj_type_id = proj_type.toLowerCase().replace(/ /g,"_");
+      
+      if (proj_type != prev_type) { 
+        
+         li_list +=  '<li id="' + proj_type_id + '"><a onclick="MapsLib.queryCitywide(\'' + proj_type + '\'); return true;" ';
+         li_list += 'href="javascript:MapsLib.queryCitywide(\'' + proj_type + '\');">';
+         li_list += proj_type + '</a></li>\n';
+      }
+      prev_type = json["rows"][rownum][0];
+    }
+    $("#citywide-types").html(li_list);
+  },
+  
   // query the citywide project (those that have Geometry) for display
-  queryCitywide: function() {
+  queryCitywide: function(project_type) {
+    // unset the previous li
+    $("ul#citywide-types li").removeClass("selected");
+  
+    // set the li as selected
+    project_type_id = project_type.toLowerCase().replace(/ /g,"_");
+    $("li#"+project_type_id).addClass("selected");
+  
     MapsLib.columnNames = ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
     	'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page'];
     
-  	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId+" WHERE District LIKE 'City%' ORDER BY 'Project Name'";
+  	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId;
+  	query += " WHERE District LIKE 'City%'";
+  	query += " AND 'Project Type'='" + project_type + "'";
+  	query += " ORDER BY 'Project Name'";
   	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
   	request.execute(MapsLib.displayCitywide);
   }, 
@@ -618,5 +652,10 @@ function HideContent(id) {
 }
 
 function ShowContent(id) {
+  // hide the other one(s) if necessary
+  $("ul#citywide-list div.googft-info-window").each(function (index) {
+    if (this.id != id) { HideContent(this.id); }
+  });
+  
 	$("div#"+id).fadeIn();
 }
