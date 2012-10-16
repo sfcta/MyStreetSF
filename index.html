@@ -19,6 +19,10 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script type="text/javascript" src="source/infobox_packed.js"></script>
     <script type="text/javascript" src="source/maps_lib.js"></script>
+    
+    <!-- for colorbox demo -->
+    <link rel="stylesheet" href="styles/colorbox.css" type="text/css"/>
+    <script type="text/javascript" src="source/jquery.colorbox.js"></script>
         
     <script>
     function OnLoadCallback() {
@@ -182,8 +186,10 @@
       </div>
       
       <div class='row-fluid'>
-        <div class='span12'>
+        <div class='span12' style="position:relative">
           <div id='mapCanvas' style="height:650px"></div>
+          <div id='wait'>Finding location<br /><img src="styles/ajax-loader.gif"></div>
+          <div id='maplogo'><img src="styles/sfcta_logo_4c_emulation_150px.png"></div>  
         </div>
       </div><!--/row-->  
 

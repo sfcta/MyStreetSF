@@ -160,6 +160,7 @@ var MapsLib = {
       if (MapsLib.address.toLowerCase().indexOf(MapsLib.locationScope) == -1)
         MapsLib.address = MapsLib.address + " " + MapsLib.locationScope;
   
+      $("div#wait").show();
       geocoder.geocode( { 'address': MapsLib.address}, MapsLib.geocodeResults);
     }
     else { //search without geocoding callback
@@ -168,7 +169,9 @@ var MapsLib = {
   },
   
   geocodeResults: function(results, status) {
-    console.log("geocodeResults!");
+    console.log("geocodeResults! status="+status);
+    $("div#wait").hide();
+    
     MapsLib.searchRadius = $("#ddlRadius").val();
     
     if (status == google.maps.GeocoderStatus.OK) {
@@ -194,8 +197,10 @@ var MapsLib = {
       MapsLib.submitSearch(MapsLib.whereClause, MapsLib.map, MapsLib.currentPinpoint);
     } 
     else {
+      console.log("We could not find your address: " + status);
       alert("We could not find your address: " + status);
     }
+    
   },
   
   submitSearch: function(whereClause, map, location) {
@@ -541,6 +546,11 @@ var MapsLib = {
 		MapsLib.doSearch();
 	},
 	
+	show_colorbox: function(url) {
+	  // console.log("show_colorbox; url="+url);
+	  jQuery().colorbox({width:"90%", height:"90%", iframe:true, href:url});
+	},
+	
 	layer_clicked: function(event) {
 		console.log("layer_clicked");
 		console.log(event);
@@ -550,6 +560,13 @@ var MapsLib = {
 		// console.log(MapsLib.infoBox);
 		
 		var text = '<div class="infoBoxRelative"><div class="infoTable">' + event.infoWindowHtml + '</div><div class="infoPointer"><img src="styles/pointer.png"></div></div>';
+		
+		// ALTERNATIVE TO NEW TAB -- COLORBOX -- TEST
+		if (event.row['Project Name']['value'] == "Dewey Traffic Calming Project") {
+  		text = text.replace(new RegExp('target="_blank" href="([^"]*)"'), 
+	   	  'target="_blank" class="iframe" onClick=\'MapsLib.show_colorbox("$1");\' target="#"');
+	  }
+		
 		MapsLib.infoBox.setContent(text);
 		MapsLib.infoBox.setPosition(event.latLng);
 		MapsLib.infoBox.open(MapsLib.map);
@@ -592,6 +609,7 @@ var MapsLib = {
  	    });
 	    MapsLib.highlightRecord.setMap(MapsLib.map); 
     }
+    
 	},
 	
 	infoBoxCloseClick : function() {
@@ -627,9 +645,7 @@ function Legend(controlDiv, json) {
 function legendContent(json) {
   // Generate the content for the legend using colors from object
   var controlTextList = new Array();
-  controlTextList.push('<p><b>');
-  controlTextList.push("Legend");
-  controlTextList.push('</b></p>');
+  controlTextList.push('<p style="margin-top:3px">Legend</p>');
   // console.log(json);
   
   var done_set = {} // project types that are done
@@ -661,7 +677,6 @@ function legendContent(json) {
     done_set[json["rows"][rownum][0]] = 1;
   }
 
-  controlTextList.push('<br />');
   return controlTextList.join('');
 }
 
