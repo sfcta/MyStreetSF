@@ -87,6 +87,7 @@ var MapsLib = {
     $("#district").prop("selectedIndex", 0);
     $("#project-type").prop("selectedIndex", 0);
     $("#project-sponsor").prop("selectedIndex", 0);
+    $("#ddlRadius").prop("selectedIndex", 1);
     $(":checkbox").prop("checked", true);
 		$("#slider").slider( "option", "value", 100 );
 		$("#txtSearchAddress").val('');
@@ -98,85 +99,102 @@ var MapsLib = {
   
   doSearch: function(location) {
     MapsLib.clearSearch();
-    var address = $("#txtSearchAddress").val();
-    MapsLib.searchRadius = $("#ddlRadius").val();
 
-    var whereClause = MapsLib.locationColumn + " not equal to ''";
+    MapsLib.whereClause = ''; // MapsLib.locationColumn + " not equal to ''";
     
     //-----filter by district-------    
     var district = $("#district").val();
 		if (district != "All") {
-		  whereClause += " AND District"+district+"=1";
+		  if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+		  MapsLib.whereClause += "District"+district+"=1";
 		}
     //-------end of filter by district code--------
 		
 		//-----filter by funding source-------
     //best way to filter results by a type is to create a 'type' column and assign each row a number (strings work as well, but numbers are faster). then we can use the 'IN' operator and return all that are selected
-    whereClause += " AND 'Funding Source Code' IN (0,";
-    if ( $("#FSPropK").is(':checked')) 		whereClause += "4,5,6,7,";  // binary: 4-bit is on
-    if ( $("#FSTFCA").is(':checked')) 		whereClause += "2,3,6,7,";  // binary: 2-bit is on
-    if ( $("#FSRegStFed").is(':checked')) whereClause += "1,3,5,7,";  // binary: 1-bit is on
-    // trim comma
-    whereClause = whereClause.substr(0,whereClause.length-1);
-    // close paren
-    whereClause += ")";
+    if (!($("#FSPropK").is(':checked')) ||
+        !($("#FSTFCA").is(':checked')) ||
+        !($("#FSRegStFed").is(':checked'))) {
+         
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
+      MapsLib.whereClause += "'Funding Source Code' IN (0,";
+      if ( $("#FSPropK").is(':checked')) 		MapsLib.whereClause += "4,5,6,7,";  // binary: 4-bit is on
+      if ( $("#FSTFCA").is(':checked')) 		MapsLib.whereClause += "2,3,6,7,";  // binary: 2-bit is on
+      if ( $("#FSRegStFed").is(':checked')) MapsLib.whereClause += "1,3,5,7,";  // binary: 1-bit is on
+      // trim comma
+      MapsLib.whereClause = MapsLib.whereClause.substr(0,MapsLib.whereClause.length-1);
+      // close paren
+      MapsLib.whereClause += ")";
+    }
     
 		//-----end of filter by funding source-------
 		
 		//-----filter by project type-------
     var ptype = $("#project-type").val();
 		if (ptype != "All") {
-		  whereClause += " AND 'Project Type'='"+ptype + "'";
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+		  MapsLib.whereClause += "'Project Type'='"+ptype + "'";
 		}
     //-----end of filter by project type-------
     
 		//-----filter by project sponsor-------    
     var psponsor = $("#project-sponsor").val();
     if (psponsor != "All") {
-    	whereClause += " AND 'Sponsor'='" + psponsor + "'";
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+    	MapsLib.whereClause += "'Sponsor'='" + psponsor + "'";
     }
     //-----end of filter by project sponsor-------    
     
 
 		//-----filter by completion date-------
-		if (MapsLib.slideDate != null) {
-			whereClause += " AND 'Project Completion Expected' <= '" + 
+		if ((MapsLib.slideDate != null) && (MapsLib.slideDate != MapsLib.maxDate)) {
+        if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+  			MapsLib.whereClause += "'Project Completion Expected' <= '" + 
 				MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
 		}
     //-----end of filter by completion date-------		
-    
-    if (address != "") {
-      if (address.toLowerCase().indexOf(MapsLib.locationScope) == -1)
-        address = address + " " + MapsLib.locationScope;
+    MapsLib.address = $("#txtSearchAddress").val();
+
+    console.log("address = " + MapsLib.address);        
+    if (MapsLib.address != "") {
+      if (MapsLib.address.toLowerCase().indexOf(MapsLib.locationScope) == -1)
+        MapsLib.address = MapsLib.address + " " + MapsLib.locationScope;
   
-      geocoder.geocode( { 'address': address}, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-          MapsLib.currentPinpoint = results[0].geometry.location;
-          
-          $.address.parameter('address', encodeURIComponent(address));
-          $.address.parameter('radius', encodeURIComponent(MapsLib.searchRadius));
-          MapsLib.map.setCenter(MapsLib.currentPinpoint);
-          MapsLib.map.setZoom(14);
-          
-          MapsLib.addrMarker = new google.maps.Marker({
-            position: MapsLib.currentPinpoint, 
-            map: MapsLib.map, 
-            animation: google.maps.Animation.DROP,
-            title:address
-          });
-          
-          whereClause += " AND ST_INTERSECTS(" + MapsLib.locationColumn + ", CIRCLE(LATLNG" + MapsLib.currentPinpoint.toString() + "," + MapsLib.searchRadius + "))";
-          
-          MapsLib.drawSearchRadiusCircle(MapsLib.currentPinpoint);
-          MapsLib.submitSearch(whereClause, MapsLib.map, MapsLib.currentPinpoint);
-        } 
-        else {
-          alert("We could not find your address: " + status);
-        }
-      });
+      geocoder.geocode( { 'address': MapsLib.address}, MapsLib.geocodeResults);
     }
     else { //search without geocoding callback
-      MapsLib.submitSearch(whereClause, MapsLib.map);
+      MapsLib.submitSearch(MapsLib.whereClause, MapsLib.map);
+    }
+  },
+  
+  geocodeResults: function(results, status) {
+    console.log("geocodeResults!");
+    MapsLib.searchRadius = $("#ddlRadius").val();
+    
+    if (status == google.maps.GeocoderStatus.OK) {
+      MapsLib.currentPinpoint = results[0].geometry.location;
+          
+      $.address.parameter('address', encodeURIComponent(MapsLib.address));
+      $.address.parameter('radius', encodeURIComponent(MapsLib.searchRadius));
+      MapsLib.map.setCenter(MapsLib.currentPinpoint);
+      MapsLib.map.setZoom(14);
+          
+      MapsLib.addrMarker = new google.maps.Marker({
+        position: MapsLib.currentPinpoint, 
+        map: MapsLib.map, 
+        animation: google.maps.Animation.DROP,
+        title:MapsLib.address
+      });
+          
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+          
+      MapsLib.whereClause += "ST_INTERSECTS(" + MapsLib.locationColumn + ", CIRCLE(LATLNG" + MapsLib.currentPinpoint.toString() + "," + MapsLib.searchRadius + "))";
+          
+      MapsLib.drawSearchRadiusCircle(MapsLib.currentPinpoint);
+      MapsLib.submitSearch(MapsLib.whereClause, MapsLib.map, MapsLib.currentPinpoint);
+    } 
+    else {
+      alert("We could not find your address: " + status);
     }
   },
   

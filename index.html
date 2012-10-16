@@ -59,8 +59,13 @@
   <body>
     <div class='container-fluid'>
       <div class='row-fluid'>
-        <div class='span6'>
+        <div class='span12' align="center">
           <h1 class='contentheading'>Active SFCTA Projects | Interactive Map</h1>
+        </div>
+      </div>
+    
+      <div class='row-fluid'>
+        <div class='span6'>
           <p>Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it.
           Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it.
           Introductory text for the SFCTA Active Projects Interactive map explains what the map is and how to use it. 
@@ -124,6 +129,18 @@
           </td>
 
           <td>
+          <label for='ddlRadius'>Within</label><br />
+          <select id='ddlRadius'>
+            <option value='400'>2 blocks</option>
+            <option value='805'>1/2 mile</option>
+            <option value='1610'>1 mile</option>
+            <option value='3220'>2 miles</option>
+          </select>
+          </td>
+          </tr>
+          
+          <tr>
+          <td>
           <label for='project-sponsor'>Project Sponsor</label><br />
           <select id='project-sponsor'>
             <option>All</option>
@@ -133,18 +150,6 @@
             <option>Port of SF</option>
             <option>SFCTA</option>
             <option>SFMTA</option>
-          </select>
-          </td>
-          </tr>
-          
-          <tr>
-          <td>
-          <label for='ddlRadius'>Within</label><br />
-          <select id='ddlRadius'>
-            <option value='400'>2 blocks</option>
-            <option value='805'>1/2 mile</option>
-            <option value='1610'>1 mile</option>
-            <option value='3220'>2 miles</option>
           </select>
           </td>
           
@@ -234,18 +239,10 @@
         
         $(function() {
           // MapsLib.initialize();
-          
-          $(':input').click(function(){
+          // call this on all but the txt search address -- for that, the enter is required          
+          $(':input:not(#txtSearchAddress)').change(function(){
             MapsLib.doSearch();
-          });
-          
-          $('#ddlRadius').change(function(){
-            MapsLib.doSearch();
-          });
-          
-          $('#btnSearch').click(function(){
-            MapsLib.doSearch();
-          });          
+          });    
           
           $('#findMe').click(function(){
             MapsLib.findMe(); 
@@ -259,10 +256,10 @@
             return false;
           });
           
-          $("#txtSearchAddress").keydown(function(e){
+          $("#txtSearchAddress").keyup(function(e){
               var key =  e.keyCode ? e.keyCode : e.which;
               if(key == 13) {
-                  $('#btnSearch').click();
+                  MapsLib.doSearch();
                   return false;
               }
           });
