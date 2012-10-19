@@ -35,6 +35,10 @@ var MapsLib = {
   currentPinpoint: 		null,
   marker: 						null,						// for currently clicked item
   
+  // columns for display and download
+  columnNames:       ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
+                      'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page'],
+  
   initialize: function() {
     if (gapi.client.fusiontables == null) {
   	  gapi.client.setApiKey(MapsLib.googleApiKey);
@@ -91,6 +95,7 @@ var MapsLib = {
     $(":checkbox").prop("checked", true);
 		$("#slider").slider( "option", "value", 100 );
 		$("#txtSearchAddress").val('');
+		
 		MapsLib.slide(null, null);
      
     //run the default search
@@ -207,6 +212,18 @@ var MapsLib = {
 		// keep the whereClause for the displayCount
 		MapsLib.whereClause = whereClause;
     console.log("whereClause = " + whereClause);
+    
+    // make the download link
+    var download_query = "SELECT '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId;
+    if (whereClause.length > 0) {
+      download_query += " WHERE " + whereClause;
+    }
+    var download_link = "https://www.googleapis.com/fusiontables/v1/query?sql=" + encodeURIComponent(download_query);
+    download_link += "&key=" + MapsLib.googleApiKey;
+    download_link += "&alt=csv";
+    $("a#download").attr('href', download_link);
+    console.log(download_link);
+    
 
     // get using all filters -- polygons on the bottom
     var polygon_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " CONTAINS 'Polygon'";
@@ -454,10 +471,7 @@ var MapsLib = {
     // set the li as selected
     project_type_id = project_type.toLowerCase().replace(/ /g,"_");
     $("li#"+project_type_id).addClass("selected");
-  
-    MapsLib.columnNames = ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
-    	'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page'];
-    
+      
   	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId;
   	query += " WHERE District LIKE 'City%'";
   	query += " AND 'Project Type'='" + project_type + "'";
