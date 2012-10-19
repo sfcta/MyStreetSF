@@ -147,7 +147,7 @@ var MapsLib = {
     
 
 		//-----filter by completion date-------
-		if ((MapsLib.slideDate != null) && (MapsLib.slideDate != MapsLib.maxDate)) {
+		if ((MapsLib.slideDate != null) && (MapsLib.slideDate.getTime() != MapsLib.maxDate.getTime())) {
         if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
   			MapsLib.whereClause += "'Project Completion Expected' <= '" + 
 				MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
