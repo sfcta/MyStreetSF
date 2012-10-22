@@ -78,6 +78,11 @@ h3 {
  margin: 0.8em 0;
 }
 
+h4 {
+ color: #EA790D;
+ font-weight: bold;
+}
+
 table.map_info {
  border-spacing: 0px;
 }
