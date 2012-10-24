@@ -100,6 +100,7 @@ var MapsLib = {
     
     MapsLib.searchrecords1 = null;
     MapsLib.searchrecords2 = null;
+    MapsLib.searchrecords3 = null;
     
     //reset filters
     if ($.address != null) {
@@ -261,14 +262,14 @@ var MapsLib = {
     MapsLib.searchrecords1.setMap(map);
     google.maps.event.addListener(MapsLib.searchrecords1, 'click', MapsLib.layer_clicked);
     
-    // non-polygons on top
-    var rest_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " DOES NOT CONTAIN 'Polygon'";
-    console.log("rest_where = " + rest_where);
+    // then Lines
+    var line_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " CONTAINS 'Line'";
+    console.log("line_where = " + line_where);
     MapsLib.searchrecords2 = new google.maps.FusionTablesLayer({
       query: {
         from:   MapsLib.fusionTableId,
         select: MapsLib.locationColumn,
-        where:  rest_where
+        where:  line_where
       },
       options: {
       	suppressInfoWindows: true
@@ -276,6 +277,23 @@ var MapsLib = {
     });
     MapsLib.searchrecords2.setMap(map);
     google.maps.event.addListener(MapsLib.searchrecords2, 'click', MapsLib.layer_clicked);
+
+    // then Points
+    var points_where = whereClause + ((whereClause.length > 0) ? " AND " : "") + MapsLib.locationColumn + " CONTAINS 'Point'";
+    console.log("points_where = " + points_where);
+    MapsLib.searchrecords3 = new google.maps.FusionTablesLayer({
+      query: {
+        from:   MapsLib.fusionTableId,
+        select: MapsLib.locationColumn,
+        where:  points_where
+      },
+      options: {
+        suppressInfoWindows: true
+      },
+    });
+    MapsLib.searchrecords3.setMap(map);
+    google.maps.event.addListener(MapsLib.searchrecords3, 'click', MapsLib.layer_clicked);
+    
     
     // district boundary if a district is used for filtering
 		var district = $("#district").val();   
@@ -310,7 +328,9 @@ var MapsLib = {
       MapsLib.searchrecords1.setMap(null);
     if (MapsLib.searchrecords2 != null)
       MapsLib.searchrecords2.setMap(null);
-      
+    if (MapsLib.searchrecords3 != null)
+      MapsLib.searchrecords3.setMap(null);
+            
     if (MapsLib.addrMarker != null)
       MapsLib.addrMarker.setMap(null);  
     if (MapsLib.searchRadiusCircle != null)
