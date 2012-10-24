@@ -36,8 +36,9 @@ var MapsLib = {
   marker: 						null,						// for currently clicked item
   
   // columns for display and download
-  columnNames:       ['Project Name','Project Type','Project Location','Description','Sponsor','District','Funding Source(s)',
-                      'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page'],
+  columnNames:       ['Project Name','Description','Project Type','Project Location','Sponsor','District','Funding Source(s)',
+                      'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page',
+                      'Project Picture', 'Picture Caption'],
   
   initialize: function() {
     if (gapi.client.fusiontables == null) {
@@ -62,7 +63,7 @@ var MapsLib = {
     	disableAutoPan:false,
     	infoBoxClearance:10,
     	maxWidth:0,
-    	pixelOffset:new google.maps.Size(-307,-70),
+    	pixelOffset:new google.maps.Size(-307,-74),
     	zIndex:null,
 			boxStyle: { 
 				// background:"white",
