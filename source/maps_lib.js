@@ -576,10 +576,11 @@ var MapsLib = {
 		var text = '<div class="infoBoxRelative"><div class="infoTable">' + event.infoWindowHtml + '</div><div class="infoPointer"><img src="styles/pointer.png"></div></div>';
 		
 		// ALTERNATIVE TO NEW TAB -- COLORBOX -- TEST
+		/*
 		if (event.row['Project Name']['value'] == "Dewey Traffic Calming Project") {
   		text = text.replace(new RegExp('target="_blank" href="([^"]*)"'), 
 	   	  'target="_blank" class="iframe" onClick=\'MapsLib.show_colorbox("$1");\' target="#"');
-	  }
+	  }*/
 		
 		MapsLib.infoBox.setContent(text);
 		MapsLib.infoBox.setPosition(event.latLng);
