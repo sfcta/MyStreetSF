@@ -221,5 +221,11 @@ div#maplogo {
 div#cboxClose, div#cboxClose:hover {
  background-image:url('x.png');
  background-position:0px 0px;
- 
+}
+
+div.projpic {
+  position:absolute;
+  bottom:0;
+  right:0;
+  padding:10px;
 }

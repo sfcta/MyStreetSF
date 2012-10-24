@@ -9,6 +9,23 @@
  * Date: 8/15/2012
  * 
  */
+
+var INFOWINDOW_HTML = "<div class='googft-info-window' style='font-family: sans-serif'>\n";
+INFOWINDOW_HTML += "<table class='map_info'>\n";
+INFOWINDOW_HTML += "<tr><th>Project Name</th><td><a target='_blank' href='{Project Details Page}'>{Project Name}</a></td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Description</th><td>{Description}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Current Phase</th><td>{Current Phase}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Funding Source(s)</th><td>{Funding Source(s)}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Project Location</th><td>{Project Location}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Project Type</th><td>{Project Type}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Sponsor</th><td>{Sponsor}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>District</th><td>{District}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Phase Completion Expected</th><td>{Phase Completion Expected}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n";
+INFOWINDOW_HTML += "</table>\n";
+INFOWINDOW_HTML += "<div class='projpic'><img src='projectpics/{Project Picture}'><br /><span class='caption'>{Picture Caption}</span></div>\n";
+INFOWINDOW_HTML += "</div>";
  
 var MapsLib = MapsLib || {};
 var MapsLib = {
@@ -36,9 +53,11 @@ var MapsLib = {
   marker: 						null,						// for currently clicked item
   
   // columns for display and download
-  columnNames:       ['Project Name','Description','Project Type','Project Location','Sponsor','District','Funding Source(s)',
-                      'Current Phase', 'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page',
+  columnNames:       ['Project Name','Description', 'Current Phase','Funding Source(s)',
+                      'Project Location','Project Type','Sponsor','District','Total Project Cost Estimate',
+                      'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page',
                       'Project Picture', 'Picture Caption'],
+                      
   
   initialize: function() {
     if (gapi.client.fusiontables == null) {
@@ -410,10 +429,6 @@ var MapsLib = {
     MapsLib.queryLegend();
     // load the citywide projects
     MapsLib.queryCitywideTypes();
-    
-    var googft = $("div.googft-info-window table td a");
-    console.log(googft);
-    console.log(googft.html());
   },
 
   queryLegend: function() {
@@ -486,13 +501,15 @@ var MapsLib = {
   	// console.log("displayCitywide");
   	// console.log(json);
   	var li_list = "";
-  	var link_col = MapsLib.columnNames.length-1;
+  	var link_col = MapsLib.columnNames.length-3;
+  	var pic_col  = MapsLib.columnNames.length-2;
+  	var pic_cap  = MapsLib.columnNames.length-1;
   	
 	  for(rownum = 0; rownum < json["rows"].length; rownum++) {
 	  	var divHtml = '<div id="citywide-' + rownum + '" class="googft-info-window citywide-info-window" style="display:none">'
 	  	divHtml += '<div class="citywide-info-x" onclick="HideContent(\'citywide-'+rownum+'\'); return true;"><img src="http://www.google.com/intl/en_us/mapfiles/close.gif"></div>';
 	  	divHtml += '<table class="map_info">';
-	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-1; colnum++) {
+	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-3; colnum++) {
 
 				// skip project location
 				if (MapsLib.columnNames[colnum] == 'Project Location') { continue; }
@@ -509,7 +526,13 @@ var MapsLib = {
 				}
 	  	  divHtml += '</td></tr>';
 	  	}
-	  	divHtml += '</table></div>';
+	  	divHtml += '</table>';
+	  	// do we have a picture?
+	  	if (json["rows"][rownum][pic_col].length > 0) {
+	  	  divHtml += '<div class="projpic"><img src="projectpics/' + json["rows"][rownum][pic_col] +'"><br />';
+	  	  divHtml += '<span class="caption">' + json["rows"][rownum][pic_cap]+'</span></div>';
+	  	}
+	  	divHtml += '</div>';
 	  	li_list += '<li><a onclick="ShowContent(\'citywide-'+rownum+'\'); return true;" ';
 	  	li_list +=        'href="javascript:ShowContent(\'citywide-'+rownum+'\');">'+json["rows"][rownum][0]+'</a></li>' + divHtml + '\n';
 		}
@@ -567,14 +590,21 @@ var MapsLib = {
 	},
 	
 	layer_clicked: function(event) {
-		console.log("layer_clicked");
 		console.log(event);
-		console.log(event.row['Project Name']['value']);
-		console.log(event.row['Icon_Name']['value']);
-		console.log(event.row['Shape']['value']);
-		// console.log(MapsLib.infoBox);
+    console.log("val=["+event.row['Total Project Cost Estimate']['value']+"]");
 		
-		var text = '<div class="infoBoxRelative"><div class="infoTable">' + event.infoWindowHtml + '</div><div class="infoPointer"><img src="styles/pointer.png"></div></div>';
+		var text = '<div class="infoBoxRelative"><div class="infoTable">'
+		// unfortunately this gets stale!  so we'll just do it ourselves...
+    // text += event.infoWindowHtml;
+    text += INFOWINDOW_HTML;
+    for (var colnum = 0; colnum < MapsLib.columnNames.length; colnum++) {
+      text = text.replace("{"+MapsLib.columnNames[colnum] + "}", event.row[MapsLib.columnNames[colnum]]['value']);
+    }
+    if (event.row['Project Picture']['value'].length == 0) {
+      text = text.replace("<div class='projpic'>", "<div class='projpic' style='visibility:hidden'>");
+    }
+		text += '</div><div class="infoPointer"><img src="styles/pointer.png"></div></div>';
+		
 		
 		// ALTERNATIVE TO NEW TAB -- COLORBOX -- TEST
 		/*
