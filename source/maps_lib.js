@@ -513,14 +513,21 @@ var MapsLib = {
 
 				// skip project location
 				if (MapsLib.columnNames[colnum] == 'Project Location') { continue; }
-				
+								
 	  	  divHtml += '<tr><th>' + MapsLib.columnNames[colnum] + '</th><td>';
 
 	  	  // link to the project details
 	  	  if (colnum==0 && json["rows"][rownum][link_col].length > 0) {
 	  	  	divHtml += '<a target="_blank" href="' + json["rows"][rownum][link_col] + '">';
 		  	}
-	  	  divHtml += json["rows"][rownum][colnum];
+		  	
+		  	// the currency amounts need to be formatted
+		  	if (MapsLib.columnNames[colnum] == 'Total Project Cost Estimate') {
+		  	  divHtml += "$" + MapsLib.addCommas(json["rows"][rownum][colnum]);
+		  	} else {
+  	  	  divHtml += json["rows"][rownum][colnum];
+  	  	}
+  	  	
 	  	  if (colnum==0 && json["rows"][rownum][link_col].length > 0) {
 					divHtml += '</a>';
 				}
@@ -537,6 +544,20 @@ var MapsLib = {
 	  	li_list +=        'href="javascript:ShowContent(\'citywide-'+rownum+'\');">'+json["rows"][rownum][0]+'</a></li>' + divHtml + '\n';
 		}
 		$('#citywide-list').html(li_list);
+  },
+
+  // for formatting numbers
+  addCommas: function(nStr)
+  {
+    nStr += '';
+    x = nStr.split('.');
+    x1 = x[0];
+    x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
   },
   
   querySliderDates: function() {
