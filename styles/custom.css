@@ -149,7 +149,7 @@ div#lineicon {
 div.citywide-info-window {
   position:absolute;
   left:200px;
-  bottom:130px;
+  bottom:30px;
   width:650px;
   border:1px solid #aaaaaa;
   background-color:white;
