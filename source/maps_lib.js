@@ -24,7 +24,7 @@ INFOWINDOW_HTML += "<tr><th>Total Project Cost Estimate</th><td>{Total Project C
 INFOWINDOW_HTML += "<tr><th>Phase Completion Expected</th><td>{Phase Completion Expected}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n";
 INFOWINDOW_HTML += "</table>\n";
-INFOWINDOW_HTML += "<div class='projpic'><img src='projectpics/{Project Picture}'><br /><span class='caption'>{Picture Caption}</span></div>\n";
+INFOWINDOW_HTML += "<div class='projpic'><div class='imageContainer'><div><img src='projectpics/{Project Picture}'><span class='caption'>{Picture Caption}</span></div></div></div>\n";
 INFOWINDOW_HTML += "</div>";
  
 var MapsLib = MapsLib || {};
@@ -556,8 +556,8 @@ var MapsLib = {
 	  	divHtml += '</table>';
 	  	// do we have a picture?
 	  	if (json["rows"][rownum][pic_col].length > 0) {
-	  	  divHtml += '<div class="projpic"><img src="projectpics/' + json["rows"][rownum][pic_col] +'"><br />';
-	  	  divHtml += '<span class="caption">' + json["rows"][rownum][pic_cap]+'</span></div>';
+	  	  divHtml += '<div class="projpic"><div class="imageContainer"><div><img src="projectpics/' + json["rows"][rownum][pic_col] +'">';
+	  	  divHtml += '<span class="caption">' + json["rows"][rownum][pic_cap]+'</span></div></div></div>';
 	  	}
 	  	divHtml += '</div>';
 	  	li_list += '<li><a onclick="ShowContent(\'citywide-'+rownum+'\'); return true;" ';
@@ -632,7 +632,6 @@ var MapsLib = {
 	
 	layer_clicked: function(event) {
 		console.log(event);
-    console.log("val=["+event.row['Total Project Cost Estimate']['value']+"]");
 		
 		var text = '<div class="infoBoxRelative"><div class="infoTable">'
 		// unfortunately this gets stale!  so we'll just do it ourselves...
