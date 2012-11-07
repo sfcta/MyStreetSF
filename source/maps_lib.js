@@ -15,8 +15,8 @@ INFOWINDOW_HTML += "<table class='map_info'>\n";
 INFOWINDOW_HTML += "<tr><th>Project Name</th><td><a target='_blank' href='{Project Details Page}'>{Project Name}</a></td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Description</th><td>{Description}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Current Phase</th><td>{Current Phase}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Funding Source(s)</th><td>{Funding Source(s)}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Project Location</th><td>{Project Location}</td></tr>\n";
+INFOWINDOW_HTML += "<tr><th>Funding Source(s)</th><td>{Funding Source(s)}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Project Type</th><td>{Project Type}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Sponsor</th><td>{Sponsor}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>District</th><td>{District}</td></tr>\n";
@@ -53,8 +53,8 @@ var MapsLib = {
   marker: 						null,						// for currently clicked item
   
   // columns for display and download
-  columnNames:       ['Project Name','Description', 'Current Phase','Funding Source(s)',
-                      'Project Location','Project Type','Sponsor','District','Total Project Cost Estimate',
+  columnNames:       ['Project Name','Description', 'Current Phase','Project Location','Funding Source(s)',
+                      'Project Type','Sponsor','District','Total Project Cost Estimate',
                       'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page',
                       'Project Picture', 'Picture Caption'],
                       
