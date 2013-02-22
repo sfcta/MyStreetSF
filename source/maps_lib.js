@@ -10,6 +10,8 @@
  * 
  */
 
+var defaultDir = '/sites/default/files/interactivemap/';
+
 var INFOWINDOW_HTML = "<div class='googft-info-window' style='font-family: sans-serif'>\n";
 INFOWINDOW_HTML += "<table class='map_info'>\n";
 INFOWINDOW_HTML += "<tr><th>Project Name</th><td><a target='_blank' href='{Project Details Page}'>{Project Name}</a></td></tr>\n";
@@ -24,7 +26,7 @@ INFOWINDOW_HTML += "<tr><th>Total Project Cost Estimate</th><td>{Total Project C
 INFOWINDOW_HTML += "<tr><th>Phase Completion Expected</th><td>{Phase Completion Expected}</td></tr>\n";
 INFOWINDOW_HTML += "<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n";
 INFOWINDOW_HTML += "</table>\n";
-INFOWINDOW_HTML += "<div class='projpic'><div class='imageContainer'><div><img src='projectpics/{Project Picture}'><span class='caption'>{Picture Caption}</span></div></div></div>\n";
+INFOWINDOW_HTML += "<div class='projpic'><div class='imageContainer'><div><img src='" +defaultDir+ "projectpics/{Project Picture}'><span class='caption'>{Picture Caption}</span></div></div></div>\n";
 INFOWINDOW_HTML += "</div>";
  
 var MapsLib = MapsLib || {};
@@ -556,7 +558,7 @@ var MapsLib = {
 	  	divHtml += '</table>';
 	  	// do we have a picture?
 	  	if (json["rows"][rownum][pic_col].length > 0) {
-	  	  divHtml += '<div class="projpic"><div class="imageContainer"><div><img src="projectpics/' + json["rows"][rownum][pic_col] +'">';
+	  	  divHtml += '<div class="projpic"><div class="imageContainer"><div><img src="' +defaultDir+ 'projectpics/' + json["rows"][rownum][pic_col] +'">';
 	  	  divHtml += '<span class="caption">' + json["rows"][rownum][pic_cap]+'</span></div></div></div>';
 	  	}
 	  	divHtml += '</div>';
@@ -643,7 +645,7 @@ var MapsLib = {
     if (event.row['Project Picture']['value'].length == 0) {
       text = text.replace("<div class='projpic'>", "<div class='projpic' style='visibility:hidden'>");
     }
-		text += '</div><div class="infoPointer"><img src="styles/pointer.png"></div></div>';
+		text += '</div><div class="infoPointer"><img src="' +defaultDir+ 'styles/pointer.png"></div></div>';
 		
 		
 		// ALTERNATIVE TO NEW TAB -- COLORBOX -- TEST
@@ -669,7 +671,7 @@ var MapsLib = {
 		// add a special marker for this
 		if (event.row['Shape']['value'] == "Point") {
 			var markerImage = new google.maps.MarkerImage(
-				"styles/" + event.row['Icon_Name']['value']+"_highlight.png",
+        defaultDir+ "styles/" + event.row['Icon_Name']['value']+"_highlight.png",
 				new google.maps.Size(13,13),
 			 	new google.maps.Point(0,0),
 			 	new google.maps.Point(7,7)
