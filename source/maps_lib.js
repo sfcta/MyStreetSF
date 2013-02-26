@@ -754,6 +754,7 @@ function legendContent(json) {
   // Generate the content for the legend using colors from object
   var controlTextList = new Array();
   controlTextList.push('<p style="margin-top:3px">Legend</p>');
+  controlTextList.push('<table id="legend">\n');
   // console.log(json);
   
   var done_set = {} // project types that are done
@@ -774,16 +775,16 @@ function legendContent(json) {
     if (color[0] != "#") { continue; }
     
     // icon images are here: https://groups.google.com/forum/?fromgroups=#!starred/fusion-tables-users-group/Zwoq9xivyXs
-    controlTextList.push('<div id="legendrow"><div id="iconbox">');
+    controlTextList.push('<tr><td>');
     // always do polylines
 	  controlTextList.push('<div id="lineicon" style="background-color:'+color+'"></div>');
-    controlTextList.push('</div>');
+    controlTextList.push('</td>');
     
-    controlTextList.push(json["rows"][rownum][0]);
-    controlTextList.push('</div>');
+    controlTextList.push('<td id="legendlabel">' + json["rows"][rownum][0] + '</td></tr>');
     
     done_set[json["rows"][rownum][0]] = 1;
   }
+  controlTextList.push('</table>\n');
 
   return controlTextList.join('');
 }
