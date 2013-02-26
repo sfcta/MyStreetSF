@@ -12,21 +12,22 @@
 
 var defaultDir = '/sites/default/files/interactivemap/';
 
-var INFOWINDOW_HTML = "<div class='googft-info-window' style='font-family: sans-serif'>\n";
+var INFOWINDOW_HTML = "<div class='googft-info-window'>\n";
 INFOWINDOW_HTML += "<table class='map_info'>\n";
-INFOWINDOW_HTML += "<tr><th>Project Name</th><td><a target='_blank' href='{Project Details Page}'>{Project Name}</a></td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Description</th><td>{Description}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Current Phase</th><td>{Current Phase}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Project Location</th><td>{Project Location}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Funding Source(s)</th><td>{Funding Source(s)}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Project Type</th><td>{Project Type}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Sponsor</th><td>{Sponsor}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>District</th><td>{District}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Phase Completion Expected</th><td>{Phase Completion Expected}</td></tr>\n";
-INFOWINDOW_HTML += "<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n";
-INFOWINDOW_HTML += "</table>\n";
-INFOWINDOW_HTML += "<div class='projpic'><div class='imageContainer'><div><img src='" +defaultDir+ "projectpics/{Project Picture}'><span class='caption'>{Picture Caption}</span></div></div></div>\n";
+INFOWINDOW_HTML += '<tr><th>Project Name</th><td colspan="2"><a target="_blank" href="{Project Details Page}">{Project Name}</a></td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Project Type</th><td colspan="2">{Project Type}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Description</th><td colspan="2">{Description}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Project Location</th><td>{Project Location}</td>';
+INFOWINDOW_HTML +=   '<td rowspan="8" valign="bottom" align="right"><img src="' +defaultDir+ 'projectpics/{Project Picture}"><br />';
+INFOWINDOW_HTML +=   '<span class="caption">{Picture Caption}</span></td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>District</th><td>{District}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Sponsor</th><td>{Sponsor}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Funding Source(s)</th><td>{Funding Source(s)}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Current Phase</th><td>{Current Phase}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Phase Completion Expected</th><td>{Phase Completion Expected}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n';
+INFOWINDOW_HTML += '</table>\n';
 INFOWINDOW_HTML += "</div>";
  
 var MapsLib = MapsLib || {};
@@ -55,8 +56,9 @@ var MapsLib = {
   marker: 						null,						// for currently clicked item
   
   // columns for display and download
-  columnNames:       ['Project Name','Description', 'Current Phase','Project Location','Funding Source(s)',
-                      'Project Type','Sponsor','District','Total Project Cost Estimate',
+  columnNames:       ['Project Name','Project Type','Description','Project Location','District',
+                      'Sponsor','Funding Source(s)',
+                      'Total Project Cost Estimate','Current Phase',
                       'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page',
                       'Project Picture', 'Picture Caption'],
                       
@@ -527,16 +529,25 @@ var MapsLib = {
   	var pic_col  = MapsLib.columnNames.length-2;
   	var pic_cap  = MapsLib.columnNames.length-1;
   	
+  	
 	  for(rownum = 0; rownum < json["rows"].length; rownum++) {
 	  	var divHtml = '<div id="citywide-' + rownum + '" class="googft-info-window citywide-info-window" style="display:none">'
 	  	divHtml += '<div class="citywide-info-x" onclick="HideContent(\'citywide-'+rownum+'\'); return true;"><img src="http://www.google.com/intl/en_us/mapfiles/close.gif"></div>';
 	  	divHtml += '<table class="map_info">';
+
+      var post_desc= false;
+      var do_pic   = false;
 	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-3; colnum++) {
 
 				// skip project location
 				if (MapsLib.columnNames[colnum] == 'Project Location') { continue; }
 								
-	  	  divHtml += '<tr><th>' + MapsLib.columnNames[colnum] + '</th><td>';
+	  	  divHtml += '<tr><th>' + MapsLib.columnNames[colnum] + '</th>';
+        if (post_desc==true) {
+          divHtml += '<td>';
+        } else {
+          divHtml += '<td colspan="2">';
+        }
 
 	  	  // link to the project details
 	  	  if (colnum==0 && json["rows"][rownum][link_col].length > 0) {
@@ -553,14 +564,23 @@ var MapsLib = {
 	  	  if (colnum==0 && json["rows"][rownum][link_col].length > 0) {
 					divHtml += '</a>';
 				}
+				
+				if (do_pic) {
+				  var rowspan=MapsLib.columnNames.length-colnum-3;
+				  divHtml += '</td><td valign="bottom" align="right" rowspan="' + rowspan.toString() + '">';
+          if (json["rows"][rownum][pic_col].length > 0) {
+            divHtml += '<img src="' +defaultDir+ 'projectpics/' + json["rows"][rownum][pic_col] +'"><br />';
+            divHtml += '<span class="caption">' + json["rows"][rownum][pic_cap]+'</span>';
+          }
+          divHtml += '</td>';
+				  do_pic = false; // only do this once
+				}
+				  
 	  	  divHtml += '</td></tr>';
+	  	  if (MapsLib.columnNames[colnum]=='Description') { post_desc=true; do_pic=true; }
 	  	}
 	  	divHtml += '</table>';
-	  	// do we have a picture?
-	  	if (json["rows"][rownum][pic_col].length > 0) {
-	  	  divHtml += '<div class="projpic"><div class="imageContainer"><div><img src="' +defaultDir+ 'projectpics/' + json["rows"][rownum][pic_col] +'">';
-	  	  divHtml += '<span class="caption">' + json["rows"][rownum][pic_cap]+'</span></div></div></div>';
-	  	}
+
 	  	divHtml += '</div>';
 	  	li_list += '<li><a onclick="ShowContent(\'citywide-'+rownum+'\'); return true;" ';
 	  	li_list +=        'href="javascript:ShowContent(\'citywide-'+rownum+'\');">'+json["rows"][rownum][0]+'</a></li>' + divHtml + '\n';
@@ -754,13 +774,13 @@ function legendContent(json) {
     if (color[0] != "#") { continue; }
     
     // icon images are here: https://groups.google.com/forum/?fromgroups=#!starred/fusion-tables-users-group/Zwoq9xivyXs
-    controlTextList.push('<div id="iconbox">');
+    controlTextList.push('<div id="legendrow"><div id="iconbox">');
     // always do polylines
 	  controlTextList.push('<div id="lineicon" style="background-color:'+color+'"></div>');
     controlTextList.push('</div>');
     
     controlTextList.push(json["rows"][rownum][0]);
-    controlTextList.push('<br style="clear: both;"/>');
+    controlTextList.push('</div>');
     
     done_set[json["rows"][rownum][0]] = 1;
   }
