@@ -760,12 +760,18 @@ function legendContent(json) {
   var done_set = {} // project types that are done
   for(rownum in json["rows"]) {
     // each row = Project Type, Shape, icon name
+    // Project Type is comma-delimited
+    var project_types = json["rows"][rownum][0].split(",");
+
+    // skip those with more than one
+    if (project_types.length > 1) { continue; }
+    project_type = project_types[0];
 
 		// ignore empties
     if (json["rows"][rownum][2] == '') { continue; }
 
 		// ignore if we've done it already
-		if (done_set.hasOwnProperty(json["rows"][rownum][0])) { continue; }
+		if (done_set.hasOwnProperty(project_type)) { continue; }
 		 
     // console.log(json["rows"][rownum]);
     var shape = json["rows"][rownum][1];
@@ -780,9 +786,9 @@ function legendContent(json) {
 	  controlTextList.push('<div id="lineicon" style="background-color:'+color+'"></div>');
     controlTextList.push('</td>');
     
-    controlTextList.push('<td id="legendlabel">' + json["rows"][rownum][0] + '</td></tr>');
+    controlTextList.push('<td id="legendlabel">' + project_type + '</td></tr>');
     
-    done_set[json["rows"][rownum][0]] = 1;
+    done_set[project_type] = 1;
   }
   controlTextList.push('</table>\n');
 
