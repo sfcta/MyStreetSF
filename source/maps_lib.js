@@ -16,16 +16,17 @@ var INFOWINDOW_HTML = "<div class='googft-info-window'>\n";
 INFOWINDOW_HTML += "<table class='map_info'>\n";
 INFOWINDOW_HTML += '<tr><th>Project Name</th><td colspan="2"><a target="_blank" href="{Project Details Page}">{Project Name}</a></td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Project Type</th><td colspan="2">{Project Type}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Project Location</th><td>{Project Location}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Supervisorial District</th><td>{District}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Description</th><td colspan="2">{Description}</td></tr>\n';
-INFOWINDOW_HTML += '<tr><th>Project Location</th><td>{Project Location}</td>';
-INFOWINDOW_HTML +=   '<td rowspan="8" valign="bottom" align="right"><img src="' +defaultDir+ 'projectpics/{Project Picture}"><br />';
+INFOWINDOW_HTML += '<tr><th>Sponsor</th><td>{Sponsor}</td>';
+INFOWINDOW_HTML +=   '<td rowspan="7" valign="bottom" align="right"><img src="' +defaultDir+ 'projectpics/{Project Picture}"><br />';
 INFOWINDOW_HTML +=   '<span class="caption">{Picture Caption}</span></td></tr>\n';
-INFOWINDOW_HTML += '<tr><th>District</th><td>{District}</td></tr>\n';
-INFOWINDOW_HTML += '<tr><th>Sponsor</th><td>{Sponsor}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Funding Source(s)</th><td>{Funding Source(s)}</td></tr>\n';
-INFOWINDOW_HTML += '<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Current Phase</th><td>{Current Phase}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Phase Completion Expected</th><td>{Phase Completion Expected}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Percent Complete<br />(Current Phase)</th><td>{Percent Complete}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n';
 INFOWINDOW_HTML += '</table>\n';
 INFOWINDOW_HTML += "</div>";
@@ -56,10 +57,11 @@ var MapsLib = {
   marker: 						null,						// for currently clicked item
   
   // columns for display and download
-  columnNames:       ['Project Name','Project Type','Description','Project Location','District',
+  columnNames:       ['Project Name','Project Type','Project Location','District','Description',
                       'Sponsor','Funding Source(s)',
-                      'Total Project Cost Estimate','Current Phase',
-                      'Phase Completion Expected', 'Project Completion Expected', 'Project Details Page',
+                      'Current Phase','Phase Completion Expected','Percent Complete',
+                      'Total Project Cost Estimate','Project Completion Expected', 
+                      'Project Details Page',
                       'Project Picture', 'Picture Caption'],
                       
   
@@ -543,7 +545,15 @@ var MapsLib = {
 				// skip project location
 				if (MapsLib.columnNames[colnum] == 'Project Location') { continue; }
 								
-	  	  divHtml += '<tr><th>' + MapsLib.columnNames[colnum] + '</th>';
+	  	  divHtml += '<tr><th>';
+	  	  if (MapsLib.columnNames[colnum] == "District") {
+	  	    divHtml += "Supervisorial District";
+	  	  } else if (MapsLib.columnNames[colnum] == 'Percent Complete') {
+	  	    divHtml += 'Percent Complete<br />(Current Phase)';
+	  	  } else {
+  	  	  divHtml += MapsLib.columnNames[colnum];
+  	  	}
+	  	  divHtml += '</th>';
         if (post_desc==true) {
           divHtml += '<td>';
         } else {
