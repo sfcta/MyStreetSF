@@ -163,7 +163,7 @@ var MapsLib = {
     var ptype = $("#project-type").val();
 		if (ptype != "All") {
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
-		  MapsLib.whereClause += "'Project Type'='"+ptype + "'";
+		  MapsLib.whereClause += "'" + ptype + "'=1";
 		}
     //-----end of filter by project type-------
     
@@ -763,7 +763,7 @@ function legendContent(json) {
     // Project Type is comma-delimited
     var project_types = json["rows"][rownum][0].split(",");
 
-    // skip those with more than one
+    // skip those with more than one -- the color isn't necessarily representative
     if (project_types.length > 1) { continue; }
     project_type = project_types[0];
 
