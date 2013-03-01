@@ -39,8 +39,13 @@ var MapsLib = {
   
   //the encrypted Table ID of your Fusion Table (found under File => About)
   //NOTE: numeric IDs will be depricated soon
-  fusionTableId:      "10zr7wF49yQWKB4A0vAtoKPfvvBPPZQ8BVEfAqDw",
-  fusionTableId_district: "195G1SlISdfHwHG8PazCkoZA9JVQaeTtqeOcehs0",
+  fusionTableId:         "10zr7wF49yQWKB4A0vAtoKPfvvBPPZQ8BVEfAqDw",
+  fusionTableStyleId:    2,  // get this from the Publish -> Get HTML and Javascript
+  fusionTableTemplateId: 2,
+  
+  fusionTableId_district:         "195G1SlISdfHwHG8PazCkoZA9JVQaeTtqeOcehs0",
+  fusionTableStyleId_district:    4,  // get this from the Publish -> Get HTML and Javascript
+  fusionTableTemplateId_district: 2,  
   
   //*New Fusion Tables Requirement* API key. found at https://code.google.com/apis/console/      
   googleApiKey:       "AIzaSyDSscDrdYK3lENjefyjoBof_JjXY5LJLRo",        
@@ -265,6 +270,8 @@ var MapsLib = {
       options: {
       	suppressInfoWindows: true
       },
+      styleId: MapsLib.fusionTableStyleId,
+      templateId: MapsLib.fusionTableTemplateId 
     });
     MapsLib.searchrecords1.setMap(map);
     google.maps.event.addListener(MapsLib.searchrecords1, 'click', MapsLib.layer_clicked);
@@ -281,6 +288,8 @@ var MapsLib = {
       options: {
       	suppressInfoWindows: true
       },
+      styleId: MapsLib.fusionTableStyleId,
+      templateId: MapsLib.fusionTableTemplateId 
     });
     MapsLib.searchrecords2.setMap(map);
     google.maps.event.addListener(MapsLib.searchrecords2, 'click', MapsLib.layer_clicked);
@@ -297,6 +306,8 @@ var MapsLib = {
       options: {
         suppressInfoWindows: true
       },
+      styleId: MapsLib.fusionTableStyleId,
+      templateId: MapsLib.fusionTableTemplateId
     });
     MapsLib.searchrecords3.setMap(map);
     google.maps.event.addListener(MapsLib.searchrecords3, 'click', MapsLib.layer_clicked);
@@ -316,7 +327,10 @@ var MapsLib = {
 					from:	MapsLib.fusionTableId_district,
 					select: "geometry",
 					where: "name = " + district
-				}
+				},
+        styleId: MapsLib.fusionTableStyleId_district,
+        templateId:  MapsLib.fusionTableTemplateId_district,  
+				
 			});
 			MapsLib.districtLayer.setMap(map);		
 		}
@@ -525,8 +539,8 @@ var MapsLib = {
   
   // create the citywide project list html
   displayCitywide: function(json) {
-  	// console.log("displayCitywide");
-  	// console.log(json);
+    //console.log("displayCitywide");
+    //console.log(json);
   	var li_list = "";
   	var link_col = MapsLib.columnNames.length-3;
   	var pic_col  = MapsLib.columnNames.length-2;
