@@ -154,7 +154,7 @@ var MapsLib = {
         !($("#FSRegStFed").is(':checked'))) {
          
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
-      MapsLib.whereClause += "'Funding Source Code' IN (0,";
+      MapsLib.whereClause += "'Funding Source' IN (0,";
       if ( $("#FSPropAA").is(':checked'))   MapsLib.whereClause += "8,9,10,11,12,13,14,15,"; // binary: 8-bit is on
       if ( $("#FSPropK").is(':checked')) 		MapsLib.whereClause += "4,5,6,7,12,13,14,15,";  // binary: 4-bit is on
       if ( $("#FSTFCA").is(':checked')) 		MapsLib.whereClause += "2,3,6,7,10,11,14,15,";  // binary: 2-bit is on
