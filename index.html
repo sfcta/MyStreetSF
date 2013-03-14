@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html style="font-family:Trebuchet MS,Helvetica,sans-serif; font-size:75%; line-height:1.5em;" lang='en'>
   <head>
     <title>SFCTA Interactive Map</title>
     <meta charset='utf-8' />
@@ -14,11 +14,14 @@
     <script type="text/javascript" src="source/jquery.js"></script>
     <script type="text/javascript" src="source/bootstrap.js"></script>
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>    
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link type="text/css" rel="stylesheet" href="styles/jquery.qtip.min.css" />
+      
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script type="text/javascript" src="source/infobox_packed.js"></script>
     <script type="text/javascript" src="source/maps_lib.js"></script>
+    <script type="text/javascript" src="source/jquery.qtip.min.js"></script>
     
     <!-- for colorbox demo -->
     <link rel="stylesheet" href="styles/colorbox.css" type="text/css"/>
@@ -115,9 +118,10 @@
           
           <td style="padding-left:20px"><label for='fundsrc'>Funding Source</label></td>
           <td>
-            <input type="checkbox" id='FSPropK' /> Prop K<br />
-            <input type="checkbox" id='FSTFCA' /> TFCA<br />
-            <input type="checkbox" id='FSRegStFed' /> Regional, State or Federal          
+        <input type="checkbox" id='FSPropAA' />&nbsp; <a  target="_blank" href="/funding-opportunities/proposition-aa-home" title="On November 2, 2010, San Francisco voters approved Proposition AA by a 59.6% vote, authorizing the Authority to collect an additional $10 annual vehicle registration fee on motor vehicles registered in San Francisco and to use the proceeds to fund projects identified in the Expenditure Plan">Prop AA</a><br />
+        <input type="checkbox" id='FSPropK' />&nbsp; <a target="_blank" href="/funding-opportunities/proposition-k" title="In November 2003, over 75% of San Francisco voters approved Prop K, extending the existing half-cent local sales tax for transportation (Prop B, approved in 1989) and approving a new 30-year Expenditure Plan identifying projects and programs to be funded by the sales tax.">Prop K</a><br />
+        <input type="checkbox" id='FSTFCA' />&nbsp; <a target="_blank" href="/funding-opportunities/transportation-fund-clean-air" title="The Authority is the designated TFCA (Transportation Fund for Clean Air) Program Manager for San Francisco.">TFCA</a><br />
+        <input type="checkbox" id='FSRegStFed' />&nbsp; <span title="Placeholder text.">Regional, State or Federal</span>
           </td>
           </tr></table>
 
@@ -131,7 +135,7 @@
           <label for='project-type'>Project Type</label><br />
           <select id='project-type'>
             <option>All</option>
-            <option>Bike</option>
+            <option>Bicycle</option>
             <option>Major Capital Projects</option>
             <option>Pedestrian Safety</option>
             <option>Plans and Studies</option>
@@ -205,7 +209,6 @@
         <div class='span12' style="position:relative">
           <div id='mapCanvas' style="height:650px"></div>
           <div id='wait'>Finding location<br /><img src="styles/ajax-loader.gif"></div>
-          <div id='maplogo'><img src="styles/sfcta_logo_4c_emulation_150px.png"></div>  
         </div>
       </div><!--/row-->  
 
