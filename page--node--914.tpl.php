@@ -80,10 +80,13 @@ var called_document_ready = false;
  -->
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>    
+<link type="text/css" rel="stylesheet" href="/sites/default/files/interactivemap/styles/jquery.qtip.min.css" />
+
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/sites/default/files/interactivemap/source/infobox_packed.js"></script>
 <script type="text/javascript" src="/sites/default/files/interactivemap/source/maps_lib.js"></script>
+<script type="text/javascript" src="/sites/default/files/interactivemap/source/jquery.qtip.min.js"></script>
 
 <!-- for colorbox demo -->
 <link rel="stylesheet" href="/sites/default/files/interactivemap/styles/colorbox.css" type="text/css"/>
