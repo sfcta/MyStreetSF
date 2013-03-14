@@ -507,7 +507,12 @@ var MapsLib = {
     var li_list = '<li id="all"><a onclick="MapsLib.queryCitywide(\'all\'); return true;" href="javascript:MapsLib.queryCitywide(\'all\');">All Citywide</a></li>\n';
     prev_type = '';
     for (rownum = 0; rownum < json["rows"].length; rownum++) {
-      proj_type = json["rows"][rownum][0];
+      // Project Type is comma-delimited
+      var project_types = json["rows"][rownum][0].split(",");
+
+      // skip those with more than one -- the color isn't necessarily representative
+      if (project_types.length > 1) { continue; }
+      proj_type = project_types[0];
       proj_type_id = proj_type.toLowerCase().replace(/ /g,"_");
       
       if (proj_type != prev_type) { 
@@ -533,7 +538,7 @@ var MapsLib = {
   	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId;
   	query += " WHERE District LIKE 'City%'";
   	if (project_type != "all") {
-    	query += " AND 'Project Type'='" + project_type + "'";
+    	query += " AND '" + project_type + "'=1";
     }
   	query += " ORDER BY 'Project Name'";
   	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
