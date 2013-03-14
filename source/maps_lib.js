@@ -503,7 +503,8 @@ var MapsLib = {
   },
   
   displayCitywideTypes: function(json) {
-    var li_list = "";
+    // all citywide
+    var li_list = '<li id="all"><a onclick="MapsLib.queryCitywide(\'all\'); return true;" href="javascript:MapsLib.queryCitywide(\'all\');">All Citywide</a></li>\n';
     prev_type = '';
     for (rownum = 0; rownum < json["rows"].length; rownum++) {
       proj_type = json["rows"][rownum][0];
@@ -531,7 +532,9 @@ var MapsLib = {
       
   	var query = "select '" + MapsLib.columnNames.join("','") + "' from " + MapsLib.fusionTableId;
   	query += " WHERE District LIKE 'City%'";
-  	query += " AND 'Project Type'='" + project_type + "'";
+  	if (project_type != "all") {
+    	query += " AND 'Project Type'='" + project_type + "'";
+    }
   	query += " ORDER BY 'Project Name'";
   	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
   	request.execute(MapsLib.displayCitywide);
