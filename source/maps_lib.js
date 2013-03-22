@@ -746,7 +746,9 @@ var MapsLib = {
       	options: {suppressInfoWindows: true},
 	      styles: [{ polygonOptions: {strokeColor:"#fff460", strokeWeight:"2", fillOpacity:1.0},
 	      					 polylineOptions: {strokeWeight:6, strokeOpacity:1.0}
-	      				}]
+	      				}],
+        styleId: MapsLib.fusionTableStyleId,
+        templateId: MapsLib.fusionTableTemplateId 	      				
  	    });
 	    MapsLib.highlightRecord.setMap(MapsLib.map); 
     }
