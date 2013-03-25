@@ -97,7 +97,8 @@ table.map_info td,
 table#filters th,
 table#filters td 
 {
-  padding: 4px 8px;
+  padding-left:8px;
+  padding-right:8px;
 }
 
 table#filters th
