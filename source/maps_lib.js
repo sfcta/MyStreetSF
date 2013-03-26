@@ -77,14 +77,24 @@ var MapsLib = {
 
     }
     
+    var styles = [{featureType:"road", stylers:[{"saturation":-70}]}];
+    // Create a new StyledMapType object, passing it the array of styles,
+    // as well as the name to be displayed on the map type control.
+    var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Map"});
+    
     geocoder = new google.maps.Geocoder();
     var myOptions = {
       zoom: MapsLib.defaultZoom,
       center: MapsLib.map_centroid,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeControlOptions: {
+        mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+      }
     };
     MapsLib.map = new google.maps.Map($("#mapCanvas")[0],myOptions);
-    
+    //Associate the styled map with the MapTypeId and set it to display.
+    MapsLib.map.mapTypes.set('map_style', styledMap);
+    MapsLib.map.setMapTypeId('map_style');
+  
     // we will render our own info box to have more control 
     // for popups and also to highlight the selected item
     MapsLib.infoBox = new InfoBox({
