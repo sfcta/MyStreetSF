@@ -599,7 +599,7 @@ var MapsLib = {
 		  	
 		  	// the currency amounts need to be formatted
 		  	if (MapsLib.columnNames[colnum] == 'Total Project Cost Estimate') {
-		  	  divHtml += "$" + MapsLib.addCommas(json["rows"][rownum][colnum]);
+		  	  divHtml += MapsLib.addCommas(json["rows"][rownum][colnum]);
 		  	} else {
   	  	  divHtml += json["rows"][rownum][colnum];
   	  	}
