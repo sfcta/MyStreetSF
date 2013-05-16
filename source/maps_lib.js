@@ -28,6 +28,7 @@ INFOWINDOW_HTML += '<tr><th>Phase Completion Expected</th><td>{Phase Completion 
 INFOWINDOW_HTML += '<tr><th>Percent Complete<br />(Current Phase)</th><td>{Percent Complete}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Active or Complete?</th><td>{Active/Complete}</td></tr>\n';
 INFOWINDOW_HTML += '</table>\n';
 INFOWINDOW_HTML += "</div>";
  
@@ -67,7 +68,7 @@ var MapsLib = {
                       'Current Phase','Phase Completion Expected','Percent Complete',
                       'Total Project Cost Estimate','Project Completion Expected', 
                       'Project Details Page',
-                      'Project Picture', 'Picture Caption'],
+                      'Project Picture', 'Picture Caption', 'Active/Complete', 'Geometry'],
                       
   
   initialize: function() {
@@ -135,6 +136,7 @@ var MapsLib = {
     $("#project-sponsor").prop("selectedIndex", 0);
     $("#ddlRadius").prop("selectedIndex", 1);
     $(":checkbox").prop("checked", true);
+    $("#Complete").prop("checked", false);    
 		$("#slider").slider( "option", "value", 100 );
 		$("#txtSearchAddress").val('');
 		
@@ -173,9 +175,26 @@ var MapsLib = {
       MapsLib.whereClause = MapsLib.whereClause.substr(0,MapsLib.whereClause.length-1);
       // close paren
       MapsLib.whereClause += ")";
-    }
-    
+    }   
 		//-----end of filter by funding source-------
+		
+    //-----filter by active/complete-------
+    var active = $("#Active").is(':checked');
+    var complete = $("#Complete").is(':checked');
+    if (active && complete) {
+      // no filtering needed
+    } else if (active) {
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+      MapsLib.whereClause += "'Active/Complete'='Active'";
+    } else if (complete) {
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
+      MapsLib.whereClause += "'Active/Complete'='Complete'";
+    } else {
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
+      MapsLib.whereClause += "'Active/Complete' NOT EQUAL TO 'Active' AND 'Active/Complete' NOT EQUAL TO 'Complete'"; 
+    }
+    //-----end of filter by active/complete-------
+		
 		
 		//-----filter by project type-------
     var ptype = $("#project-type").val();
@@ -696,13 +715,14 @@ var MapsLib = {
 	},
 	
 	layer_clicked: function(event) {
-		console.log(event);
+		// console.log(event);
 		
 		var text = '<div class="infoBoxRelative"><div class="infoTable">'
 		// unfortunately this gets stale!  so we'll just do it ourselves...
     // text += event.infoWindowHtml;
     text += INFOWINDOW_HTML;
     for (var colnum = 0; colnum < MapsLib.columnNames.length; colnum++) {
+      if (MapsLib.columnNames[colnum]=='Geometry') { continue; }
       text = text.replace("{"+MapsLib.columnNames[colnum] + "}", event.row[MapsLib.columnNames[colnum]]['value']);
     }
     if (event.row['Project Picture']['value'].length == 0) {
