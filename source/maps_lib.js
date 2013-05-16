@@ -579,9 +579,9 @@ var MapsLib = {
     //console.log("displayCitywide");
     //console.log(json);
   	var li_list = "";
-  	var link_col = MapsLib.columnNames.length-3;
-  	var pic_col  = MapsLib.columnNames.length-2;
-  	var pic_cap  = MapsLib.columnNames.length-1;
+  	var link_col = MapsLib.columnNames.length-5;
+  	var pic_col  = MapsLib.columnNames.length-4;
+  	var pic_cap  = MapsLib.columnNames.length-3;
   	
   	
 	  for(rownum = 0; rownum < json["rows"].length; rownum++) {
@@ -594,7 +594,9 @@ var MapsLib = {
 	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-3; colnum++) {
 
 				// skip project location
-				if (MapsLib.columnNames[colnum] == 'Project Location') { continue; }
+				if (MapsLib.columnNames[colnum] == 'Project Location')      { continue; }
+        if (MapsLib.columnNames[colnum] == 'Project Details Page')  { continue; }
+        if (MapsLib.columnNames[colnum] == 'Project Picture')       { continue; }
 								
 	  	  divHtml += '<tr><th>';
 	  	  if (MapsLib.columnNames[colnum] == "District") {
