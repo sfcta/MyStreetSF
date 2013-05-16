@@ -730,6 +730,11 @@ var MapsLib = {
     if (event.row['Project Picture']['value'].length == 0) {
       text = text.replace("<div class='projpic'>", "<div class='projpic' style='visibility:hidden'>");
     }
+    
+    if (event.row['Project Details Page']['value'].length == 0) {
+      text = text.replace('<a target="_blank" href="">', '');
+      text = text.replace('</a>', '');
+    }
 		text += '</div><div class="infoPointer"><img src="' +defaultDir+ 'styles/pointer.png"></div></div>';
 		
 		
