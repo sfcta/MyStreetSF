@@ -728,7 +728,8 @@ var MapsLib = {
       text = text.replace("{"+MapsLib.columnNames[colnum] + "}", event.row[MapsLib.columnNames[colnum]]['value']);
     }
     if (event.row['Project Picture']['value'].length == 0) {
-      text = text.replace("<div class='projpic'>", "<div class='projpic' style='visibility:hidden'>");
+      var to_replace = '<img src="' +defaultDir+ 'projectpics/">';
+      text = text.replace(to_replace, '');
     }
     
     if (event.row['Project Details Page']['value'].length == 0) {
