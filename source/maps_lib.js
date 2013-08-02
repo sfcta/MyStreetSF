@@ -28,7 +28,7 @@ INFOWINDOW_HTML += '<tr><th>Phase Completion Expected</th><td>{Phase Completion 
 INFOWINDOW_HTML += '<tr><th>Percent Complete<br />(Current Phase)</th><td>{Percent Complete}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Total Project Cost Estimate</th><td>{Total Project Cost Estimate}</td></tr>\n';
 INFOWINDOW_HTML += '<tr><th>Project Completion Expected</th><td>{Project Completion Expected}</td></tr>\n';
-INFOWINDOW_HTML += '<tr><th>Active or Complete?</th><td>{Active/Complete}</td></tr>\n';
+INFOWINDOW_HTML += '<tr><th>Active/Complete/Proposed</th><td>{Status}</td></tr>\n';
 INFOWINDOW_HTML += '</table>\n';
 INFOWINDOW_HTML += "</div>";
  
@@ -67,8 +67,8 @@ var MapsLib = {
                       'Sponsor','Funding Source(s)',
                       'Current Phase','Phase Completion Expected','Percent Complete',
                       'Total Project Cost Estimate','Project Completion Expected', 
-                      'Project Details Page',
-                      'Project Picture', 'Picture Caption', 'Active/Complete', 'Geometry'],
+                      'Status', 'Project Details Page',
+                      'Project Picture', 'Picture Caption', 'Geometry'],
                       
   
   initialize: function() {
@@ -136,7 +136,9 @@ var MapsLib = {
     $("#project-sponsor").prop("selectedIndex", 0);
     $("#ddlRadius").prop("selectedIndex", 1);
     $(":checkbox").prop("checked", true);
-    $("#Complete").prop("checked", false);    
+    $("#Active").prop("checked", true);    
+    $("#Complete").prop("checked", true);    
+    $("#Proposed").prop("checked", true);    
 		$("#slider").slider( "option", "value", 100 );
 		$("#txtSearchAddress").val('');
 		
@@ -181,17 +183,30 @@ var MapsLib = {
     //-----filter by active/complete-------
     var active = $("#Active").is(':checked');
     var complete = $("#Complete").is(':checked');
-    if (active && complete) {
-      // no filtering needed
-    } else if (active) {
+    var proposed = $("#Proposed").is(':checked');
+    if (active && complete && proposed) {
+      // no filtering necessary
+    }
+    else if (!active && !complete && !proposed) {
+      // no filters?
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
-      MapsLib.whereClause += "'Active/Complete'='Active'";
-    } else if (complete) {
+      MapsLib.whereClause += "'Status'='Dummy'";      
+    }
+    else {
+      var status_in = "";
+      if (active) {
+        status_in += "'Active'";
+      }
+      if (complete) {
+        if (status_in.length > 0) status_in += ",";
+        status_in += "'Complete'";
+      }
+      if (proposed) {
+        if (status_in.length > 0) status_in += ",";
+        status_in += "'Proposed'";
+      }       
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
-      MapsLib.whereClause += "'Active/Complete'='Complete'";
-    } else {
-      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
-      MapsLib.whereClause += "'Active/Complete' NOT EQUAL TO 'Active' AND 'Active/Complete' NOT EQUAL TO 'Complete'"; 
+        MapsLib.whereClause += "'Status' IN (" + status_in + ")";
     }
     //-----end of filter by active/complete-------
 		
@@ -579,9 +594,9 @@ var MapsLib = {
     //console.log("displayCitywide");
     //console.log(json);
   	var li_list = "";
-  	var link_col = MapsLib.columnNames.length-5;
-  	var pic_col  = MapsLib.columnNames.length-4;
-  	var pic_cap  = MapsLib.columnNames.length-3;
+  	var link_col = MapsLib.columnNames.length-4;
+  	var pic_col  = MapsLib.columnNames.length-3;
+  	var pic_cap  = MapsLib.columnNames.length-2;
   	
   	
 	  for(rownum = 0; rownum < json["rows"].length; rownum++) {
@@ -591,12 +606,13 @@ var MapsLib = {
 
       var post_desc= false;
       var do_pic   = false;
-	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-3; colnum++) {
+	  	for (var colnum = 0; colnum < MapsLib.columnNames.length-2; colnum++) {
 
 				// skip project location
 				if (MapsLib.columnNames[colnum] == 'Project Location')      { continue; }
         if (MapsLib.columnNames[colnum] == 'Project Details Page')  { continue; }
         if (MapsLib.columnNames[colnum] == 'Project Picture')       { continue; }
+        if (MapsLib.columnNames[colnum] == 'Geometry')              { continue; }
 								
 	  	  divHtml += '<tr><th>';
 	  	  if (MapsLib.columnNames[colnum] == "District") {
