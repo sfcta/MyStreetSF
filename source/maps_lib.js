@@ -165,14 +165,16 @@ var MapsLib = {
     //best way to filter results by a type is to create a 'type' column and assign each row a number (strings work as well, but numbers are faster). then we can use the 'IN' operator and return all that are selected
     if (!($("#FSPropK").is(':checked')) ||
         !($("#FSTFCA").is(':checked')) ||
-        !($("#FSRegStFed").is(':checked'))) {
+        !($("#FSRegStFed").is(':checked')) ||
+        !($("#FSOBAG").is(':checked'))) {
          
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
       MapsLib.whereClause += "'Funding Source' IN (0,";
-      if ( $("#FSPropAA").is(':checked'))   MapsLib.whereClause += "8,9,10,11,12,13,14,15,"; // binary: 8-bit is on
-      if ( $("#FSPropK").is(':checked')) 		MapsLib.whereClause += "4,5,6,7,12,13,14,15,";  // binary: 4-bit is on
-      if ( $("#FSTFCA").is(':checked')) 		MapsLib.whereClause += "2,3,6,7,10,11,14,15,";  // binary: 2-bit is on
-      if ( $("#FSRegStFed").is(':checked')) MapsLib.whereClause += "1,3,5,7,9,11,13,15,";  // binary: 1-bit is on
+      if ( $("#FSOBAG").is(':checked'))     MapsLib.whereClause += "16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"; // binary: 16-bit is on
+      if ( $("#FSPropAA").is(':checked'))   MapsLib.whereClause += "8,9,10,11,12,13,14,15,24,25,26,27,28,29,30,31"; // binary: 8-bit is on
+      if ( $("#FSPropK").is(':checked')) 		MapsLib.whereClause += "4,5,6,7,12,13,14,15,20,21,22,23,28,29,30,31";  // binary: 4-bit is on
+      if ( $("#FSTFCA").is(':checked')) 		MapsLib.whereClause += "2,3,6,7,10,11,14,15,18,19,22,23,26,27,30,31";  // binary: 2-bit is on
+      if ( $("#FSRegStFed").is(':checked')) MapsLib.whereClause += "1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31";  // binary: 1-bit is on
       // trim comma
       MapsLib.whereClause = MapsLib.whereClause.substr(0,MapsLib.whereClause.length-1);
       // close paren
