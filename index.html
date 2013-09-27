@@ -117,7 +117,7 @@
           </td>
           
           <td style="padding-left:20px"><label for='fundsrc'>Funding Source</label></td>
-          <td>
+          <td id='fundingsrc'>
         <input type="checkbox" id='FSPropK' />&nbsp; <a target="_blank" href="/funding-opportunities/proposition-k" title="Half-cent local sales tax">Prop K</a><br />
         <input type="checkbox" id='FSPropAA' />&nbsp; <a  target="_blank" href="/funding-opportunities/proposition-aa-home" title="$10 annual vehicle registration fee on motor vehicles registered in San Francisco">Prop AA</a><br />
         <input type="checkbox" id='FSTFCA' />&nbsp; <a target="_blank" href="/funding-opportunities/transportation-fund-clean-air" title="$4 surcharge on the vehicle registration fee">TFCA</a><br />
@@ -125,7 +125,7 @@
         <input type="checkbox" id='FSRegStFed' />&nbsp; Regional, State or Federal          </td>
         
         <td style="padding-left:20px"><label for='active_complete'>Status </label></td>
-        <td>
+        <td id='active_complete'>
         <input type="checkbox" id="Active" />&nbsp; Active<br />
         <input type="checkbox" id="Complete" />&nbsp; Complete<br />
         <input type="checkbox" id="Proposed" />&nbsp; Proposed<br />
@@ -289,7 +289,7 @@
           
           $('#reset').click(function(){
             $.address.parameter('address','');
-            MapsLib.initialize();
+            MapsLib.initialize("reset");
             MapsLib.redisplayLegend();
             return false;
           });

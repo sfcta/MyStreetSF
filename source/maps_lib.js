@@ -71,7 +71,17 @@ var MapsLib = {
                       'Project Picture', 'Picture Caption', 'Geometry'],
                       
   
-  initialize: function() {
+  initialize: function(href_args) {
+    // interpret the arg - if blank, access the URL args
+    if (href_args=== undefined) { href_args = location.search; }
+    console.log("initialize() called with href_args=" + href_args);
+
+    // parse them into individual parameters
+    if (href_args != "reset") { href_params = getQueryParams(href_args); }
+    else { href_params = "reset"; }
+    console.log("href_params = ");
+    console.log(href_params);
+    
     if (gapi.client.fusiontables == null) {
   	  gapi.client.setApiKey(MapsLib.googleApiKey);
       gapi.client.load('fusiontables', 'v1', MapsLib.fusiontablesLoaded);
@@ -135,10 +145,29 @@ var MapsLib = {
     $("#project-type").prop("selectedIndex", 0);
     $("#project-sponsor").prop("selectedIndex", 0);
     $("#ddlRadius").prop("selectedIndex", 1);
-    $(":checkbox").prop("checked", true);
-    $("#Active").prop("checked", true);    
-    $("#Complete").prop("checked", true);    
-    $("#Proposed").prop("checked", true);    
+    
+    // for reset -- default everything to on
+    if (href_params == "reset") {
+        $("td#fundingsrc :checkbox").prop("checked", true);
+        $("td#active_complete :checkbox").prop("checked", true);
+    }
+    else {  // but if any URL params specify, then select those only
+      var fs_selected = false;
+      if (href_params.FSPropK    == "on") { fs_selected = true;  $("#FSPropK").prop("checked", true);}
+      if (href_params.FSPropAA   == "on") { fs_selected = true;  $("#FSPropAA").prop("checked", true); }
+      if (href_params.FSTFCA     == "on") { fs_selected = true;  $("#FSTFCA").prop("checked", true); }
+      if (href_params.FSOBAG     == "on") { fs_selected = true;  $("#FSOBAG").prop("checked", true); }
+      if (href_params.FSRegStFed == "on") { fs_selected = true;  $("#FSRegStFed").prop("checked", true); }
+      // if nothin specified, select them all
+      if (fs_selected == false) { $("td#fundingsrc :checkbox").prop("checked", true); }      
+
+      var status_selected = false;
+      if (href_params.Active   == "on") { status_selected = true; $("#Active").prop("checked", true); }
+      if (href_params.Complete == "on") { status_selected = true; $("#Complete").prop("checked", true); }
+      if (href_params.Proposed == "on") { status_selected = true; $("#Proposed").prop("checked", true); }
+      if (status_selected == false) { $("td#active_complete :checkbox").prop("checked", true); }
+    }
+    
 		$("#slider").slider( "option", "value", 100 );
 		$("#txtSearchAddress").val('');
 		
@@ -897,4 +926,19 @@ function ShowContent(id) {
   });
   
 	$("div#"+id).fadeIn();
+}
+
+// Parse url args into dictionary.  E.g. "?FSPropK=on&Proposed=on" => { FSPropK:"on", Proposed:"on" }
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+
+    var params = {}, tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
 }
