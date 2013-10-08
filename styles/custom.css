@@ -143,10 +143,9 @@ div#lineicon {
 }
 
 div.citywide-info-window {
-  position:absolute;
-  left:200px;
-  bottom:30px;
-  width:650px;
+  position:relative;
+  left:-350px;
+  width:600px;
   border:1px solid #aaaaaa;
   background-color:white;
   padding:5px;
