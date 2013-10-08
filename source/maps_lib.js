@@ -181,12 +181,14 @@ var MapsLib = {
     MapsLib.clearSearch();
 
     MapsLib.whereClause = ''; // MapsLib.locationColumn + " not equal to ''";
+    MapsLib.citywideWhereClause = '';
     
     //-----filter by district-------    
     var district = $("#district").val();
 		if (district != "All") {
 		  if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
 		  MapsLib.whereClause += "District"+district+"=1";
+		  // does not apply to citywide
 		}
     //-------end of filter by district code--------
 		
@@ -197,17 +199,20 @@ var MapsLib = {
         !($("#FSRegStFed").is(':checked')) ||
         !($("#FSOBAG").is(':checked'))) {
          
-      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
-      MapsLib.whereClause += "'Funding Source' IN (0,";
-      if ( $("#FSOBAG").is(':checked'))     MapsLib.whereClause += "16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"; // binary: 16-bit is on
-      if ( $("#FSPropAA").is(':checked'))   MapsLib.whereClause += "8,9,10,11,12,13,14,15,24,25,26,27,28,29,30,31"; // binary: 8-bit is on
-      if ( $("#FSPropK").is(':checked')) 		MapsLib.whereClause += "4,5,6,7,12,13,14,15,20,21,22,23,28,29,30,31";  // binary: 4-bit is on
-      if ( $("#FSTFCA").is(':checked')) 		MapsLib.whereClause += "2,3,6,7,10,11,14,15,18,19,22,23,26,27,30,31";  // binary: 2-bit is on
-      if ( $("#FSRegStFed").is(':checked')) MapsLib.whereClause += "1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31";  // binary: 1-bit is on
+      fsclause = "'Funding Source' IN (0,";
+      if ( $("#FSOBAG").is(':checked'))     fsclause += "16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"; // binary: 16-bit is on
+      if ( $("#FSPropAA").is(':checked'))   fsclause += "8,9,10,11,12,13,14,15,24,25,26,27,28,29,30,31"; // binary: 8-bit is on
+      if ( $("#FSPropK").is(':checked'))    fsclause += "4,5,6,7,12,13,14,15,20,21,22,23,28,29,30,31";  // binary: 4-bit is on
+      if ( $("#FSTFCA").is(':checked'))     fsclause += "2,3,6,7,10,11,14,15,18,19,22,23,26,27,30,31";  // binary: 2-bit is on
+      if ( $("#FSRegStFed").is(':checked')) fsclause += "1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31";  // binary: 1-bit is on
       // trim comma
-      MapsLib.whereClause = MapsLib.whereClause.substr(0,MapsLib.whereClause.length-1);
+      fsclause = fsclause.substr(0,fsclause.length-1);
       // close paren
-      MapsLib.whereClause += ")";
+      fsclause += ")";
+      
+      if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND ";
+      MapsLib.whereClause += fsclause;
+      MapsLib.citywideWhereClause += fsclause;
     }   
 		//-----end of filter by funding source-------
 		
@@ -221,7 +226,10 @@ var MapsLib = {
     else if (!active && !complete && !proposed) {
       // no filters?
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
-      MapsLib.whereClause += "'Status'='Dummy'";      
+      MapsLib.whereClause += "'Status'='Dummy'";
+      
+      if (MapsLib.citywideWhereClause.length > 0) MapsLib.citywideWhereClause += " AND "; 
+      MapsLib.citywideWhereClause += "'Status'='Dummy'";
     }
     else {
       var status_in = "";
@@ -237,7 +245,10 @@ var MapsLib = {
         status_in += "'Proposed'";
       }       
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
-        MapsLib.whereClause += "'Status' IN (" + status_in + ")";
+      MapsLib.whereClause += "'Status' IN (" + status_in + ")";
+
+      if (MapsLib.citywideWhereClause.length > 0) MapsLib.citywideWhereClause += " AND "; 
+      MapsLib.citywideWhereClause += "'Status' IN (" + status_in + ")";      
     }
     //-----end of filter by active/complete-------
 		
@@ -255,6 +266,9 @@ var MapsLib = {
     if (psponsor != "All") {
       if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
     	MapsLib.whereClause += "'Sponsor'='" + psponsor + "'";
+
+      if (MapsLib.citywideWhereClause.length > 0) MapsLib.citywideWhereClause += " AND "; 
+      MapsLib.citywideWhereClause += "'Sponsor'='" + psponsor + "'";
     }
     //-----end of filter by project sponsor-------    
     
@@ -263,7 +277,10 @@ var MapsLib = {
 		if ((MapsLib.slideDate != null) && (MapsLib.slideDate.getTime() != MapsLib.maxDate.getTime())) {
         if (MapsLib.whereClause.length > 0) MapsLib.whereClause += " AND "; 
   			MapsLib.whereClause += "'Project Completion Expected' <= '" + 
-				MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
+				  MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
+
+        MapsLib.citywideWhereClause += "'Project Completion Expected' <= '" + 
+          MapsLib.slideDate.getFullYear() + "." + (MapsLib.slideDate.getMonth()+1) + "." + MapsLib.slideDate.getDate() + "'";
 		}
     //-----end of filter by completion date-------		
     MapsLib.address = $("#txtSearchAddress").val();
@@ -279,6 +296,9 @@ var MapsLib = {
     else { //search without geocoding callback
       MapsLib.submitSearch(MapsLib.whereClause, MapsLib.map);
     }
+    
+    MapsLib.queryCitywideTypes();
+    
   },
   
   geocodeResults: function(results, status) {
@@ -572,33 +592,47 @@ var MapsLib = {
   },
   
   queryCitywideTypes: function() {
-    var query = "select 'Project Type' from " + MapsLib.fusionTableId + " WHERE District Like 'City%' ORDER BY 'Project Type'";
+    var query = "select 'Project Type' from " + MapsLib.fusionTableId + " WHERE District Like 'City%'";
+    if (MapsLib.citywideWhereClause.length > 0) {
+      query += " AND " + MapsLib.citywideWhereClause;
+    }
+    query += " ORDER BY 'Project Type'";
+    // not ready yet
+    if (gapi.client.fusiontables==null) { return; }
+    // console.log("query city wide types: query=" + query);    
     var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
     request.execute(MapsLib.displayCitywideTypes);
   },
   
   displayCitywideTypes: function(json) {
     // all citywide
-    var li_list = '<li id="all"><a onclick="MapsLib.queryCitywide(\'all\'); return true;" href="javascript:MapsLib.queryCitywide(\'all\');">All Citywide</a></li>\n';
-    prev_type = '';
-    for (rownum = 0; rownum < json["rows"].length; rownum++) {
-      // Project Type is comma-delimited
-      var project_types = json["rows"][rownum][0].split(",");
+    if (json.hasOwnProperty("rows")) {
+      var li_list = '<li id="all"><a onclick="MapsLib.queryCitywide(\'all\'); return true;" href="javascript:MapsLib.queryCitywide(\'all\');">All Citywide';
+      if (MapsLib.citywideWhereClause.length > 0) { li_list += " (Filtered)"; }
+      li_list += '</a></li>\n';
+      prev_type = '';
+      for (rownum = 0; rownum < json["rows"].length; rownum++) {
+        // Project Type is comma-delimited
+        var project_types = json["rows"][rownum][0].split(",");
 
-      // skip those with more than one -- the color isn't necessarily representative
-      if (project_types.length > 1) { continue; }
-      proj_type = project_types[0];
-      proj_type_id = proj_type.toLowerCase().replace(/ /g,"_");
+        // skip those with more than one -- the color isn't necessarily representative
+        if (project_types.length > 1) { continue; }
+        proj_type = project_types[0];
+        proj_type_id = proj_type.toLowerCase().replace(/ /g,"_");
       
-      if (proj_type != prev_type) { 
+        if (proj_type != prev_type) { 
         
-         li_list +=  '<li id="' + proj_type_id + '"><a onclick="MapsLib.queryCitywide(\'' + proj_type + '\'); return true;" ';
-         li_list += 'href="javascript:MapsLib.queryCitywide(\'' + proj_type + '\');">';
-         li_list += proj_type + '</a></li>\n';
+          li_list +=  '<li id="' + proj_type_id + '"><a onclick="MapsLib.queryCitywide(\'' + proj_type + '\'); return true;" ';
+          li_list += 'href="javascript:MapsLib.queryCitywide(\'' + proj_type + '\');">';
+          li_list += proj_type + '</a></li>\n';
+        }
+        prev_type = json["rows"][rownum][0];
       }
-      prev_type = json["rows"][rownum][0];
+      $("#citywide-types").html(li_list);    
+    } else {
+      $("#citywide-types").html("No citywide projects found for the given filter(s).");
     }
-    $("#citywide-types").html(li_list);
+    $("#citywide-list").html("");
   },
   
   // query the citywide project (those that have Geometry) for display
@@ -615,7 +649,11 @@ var MapsLib = {
   	if (project_type != "all") {
     	query += " AND '" + project_type + "'=1";
     }
+    if (MapsLib.citywideWhereClause.length > 0) {
+      query += " AND " + MapsLib.citywideWhereClause;
+    }    
   	query += " ORDER BY 'Project Name'";
+    // console.log("query city wide: query=" + query);
   	var request = gapi.client.fusiontables.query.sqlGet({'sql':query});
   	request.execute(MapsLib.displayCitywide);
   }, 
